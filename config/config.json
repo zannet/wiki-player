@@ -1,0 +1,8 @@
+{
+	"Host": "localhost",
+	"Database": "gojimusic",
+	"Driver": "mysql",
+	"Username": "root",
+	"Password": "redeye",
+	"LogDir": "/home/adred/Golang/src/bitbucket.org/adred/wiki-player/log"
+}

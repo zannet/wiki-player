@@ -1,10 +1,10 @@
 package config
 
 import (
-	"encoding/xml"
-	"io"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sync"
 
 	"github.com/goinggo/tracelog"
@@ -13,22 +13,20 @@ import (
 type (
 	singleton struct {
 		once  sync.Once
-		value config
+		value configMap
+	}
+
+	configMap struct {
+		ConfigMap map[string]string
 	}
 
 	config struct {
-		ConfigMap map[string]string // The map of strap key value pairs
-	}
-
-	XMLStrap struct {
-		XMLName xml.Name `xml:"strap"`
-		Key     string   `xml:"key,attr"`
-		Value   string   `xml:"value,attr"`
-	}
-
-	XMLStraps struct {
-		XMLName xml.Name   `xml:"straps"`
-		Straps  []XMLStrap `xml:"strap"`
+		Host     string
+		Database string
+		Driver   string
+		Username string
+		Password string
+		LogDir   string
 	}
 )
 
@@ -36,48 +34,39 @@ var ci singleton
 
 func MustLoad() {
 	ci.once.Do(func() {
-		// Find the location of the config.xml file
-		configFilePath, err := filepath.Abs("config/config.xml")
+		// Find the location of the config.json file
+		configFilePath, err := filepath.Abs("config/config.json")
 
-		// Open the config.xml file
+		// Open the config.json file
 		file, err := os.Open(configFilePath)
 		if err != nil {
 			tracelog.CompletedError(err, "MustLoad", "os.Open")
 			panic(err.Error())
 		}
-
 		defer file.Close()
 
 		// Read the config file
-		entries, err := readStraps(file)
+		decoder := json.NewDecoder(file)
+		c := &config{}
+		err = decoder.Decode(&c)
 		if err != nil {
 			panic(err.Error())
 		}
 
-		// Create a config object
-		ci.value = config{
-			ConfigMap: make(map[string]string),
-		}
+		// Create a configMap object
+		ci.value = configMap{ConfigMap: make(map[string]string)}
 
-		//Store the key/value pairs for each strap
-		for _, entry := range entries {
-			ci.value.ConfigMap[entry.Key] = entry.Value
+		// Assign config field:value pairs to ConfigMap
+		v := reflect.ValueOf(c).Elem()
+		vType := v.Type()
+		for i := 0; i < v.NumField(); i++ {
+			f := v.Field(i)
+			ci.value.ConfigMap[vType.Field(i).Name] = f.Interface().(string)
 		}
 	})
-}
-
-func readStraps(reader io.Reader) ([]XMLStrap, error) {
-	var xmlStraps XMLStraps
-	if err := xml.NewDecoder(reader).Decode(&xmlStraps); err != nil {
-		tracelog.CompletedError(err, "readStraps", "xml.NewDecoder")
-		return nil, err
-	}
-
-	return xmlStraps.Straps, nil
 }
 
 func Entry(key string) string {
 	MustLoad()
 	return ci.value.ConfigMap[key]
 }
-
