@@ -19,8 +19,8 @@ type (
 	}
 )
 
-func (sm *SongModel) GetAll() (songs []*song, err error) {
-	songs = []*song{}
+func (sm *SongModel) GetAll() ([]*song, error) {
+	songs := []*song{}
 
 	stmt, err := sm.DB.Handle.Prepare("SELECT * FROM songs")
 	if err != nil {
