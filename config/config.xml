@@ -4,5 +4,5 @@
     <strap key="Driver" value="mysql"/>
     <strap key="Username" value="root"/>
     <strap key="Password" value="redeye"/>
-    <strap key="LogDir" value="/home/adred/Golang/src/bitbucket.org/adred/cloud-music-player/log"/>
+    <strap key="LogDir" value="/home/adred/Golang/src/bitbucket.org/adred/wiki-player/log"/>
 </straps>

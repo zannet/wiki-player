@@ -1,70 +1,39 @@
 package main
 
 import (
-	"net/http"
 	"os"
 
-	"bitbucket.org/adred/cloud-music-player/config"
-	"bitbucket.org/adred/cloud-music-player/controllers"
-	"bitbucket.org/adred/cloud-music-player/models"
-	"bitbucket.org/adred/cloud-music-player/utils"
-	"bitbucket.org/adred/cloud-music-player/utils/helpers"
+	"bitbucket.org/adred/wiki-player/config"
+	"bitbucket.org/adred/wiki-player/controllers"
+	"bitbucket.org/adred/wiki-player/models"
+	"bitbucket.org/adred/wiki-player/utils"
+	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
-	"github.com/unrolled/render"
-	"github.com/zenazn/goji"
-	"github.com/zenazn/goji/web"
 )
-
-// Our custom handler type
-type appHandler func(web.C, http.ResponseWriter, *http.Request) *helpers.AppError
-
-// We need to implement net/http's ServeHTTP too
-func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
-
-// Handler
-func (fn appHandler) ServeHTTPC(c web.C, w http.ResponseWriter, r *http.Request) {
-	if err := fn(c, w, r); err != nil {
-		switch err.Code {
-		case http.StatusOK:
-			// Do nothing
-		case http.StatusNotFound:
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		case http.StatusInternalServerError:
-			http.Error(w, http.StatusText(http.StatusInternalServerError),
-				http.StatusInternalServerError)
-		default:
-			// Catch any other errors we haven't explicitly handled
-			http.Error(w, http.StatusText(http.StatusInternalServerError),
-				http.StatusInternalServerError)
-		}
-	}
-}
 
 // Our main go routine
 func main() {
 	// Start logger
-	tracelog.StartFile(1, config.Entry("LogDir"), 15)
+	tracelog.StartFile(1, config.Entry("LogDir"), 1)
 
-	// Open DB
-	db := &utils.DB{}
-	err := db.Open()
+	// Create new DB
+	db, err := utils.NewDB()
 	if err != nil {
 		os.Exit(1)
 	}
 	// Close DB
-	defer db.Close()
-	// Init render
-	rdr := render.New(render.Options{Directory: "views"})
+	defer db.Handle.Close()
+
 	// Init SongModel
-	sm := &models.SongModel{DB: db.Conn}
+	sm := &models.SongModel{DB: db}
 	// Init SongController
-	sc := &controllers.SongController{SM: sm, Rdr: rdr}
+	sc := &controllers.SongController{SM: sm}
 
-	// Routes
-	goji.Get("/", appHandler(sc.Index))
+	mux := gin.Default()
+	mux.GET("/", sc.Index)
 
-	// Serve app
-	goji.Serve()
+	// Listen and server on 0.0.0.0:8080
+	mux.Run(":8080")
 
 	tracelog.Stop()
 }

@@ -1,12 +1,12 @@
 package models
 
 import (
-	"database/sql"
+	"bitbucket.org/adred/wiki-player/utils"
 )
 
 type (
 	SongModel struct {
-		DB *sql.DB
+		DB *utils.DB
 	}
 
 	song struct {
@@ -22,7 +22,7 @@ type (
 func (sm *SongModel) GetAll() (songs []*song, err error) {
 	songs = []*song{}
 
-	stmt, err := sm.DB.Prepare("SELECT * FROM songs")
+	stmt, err := sm.DB.Handle.Prepare("SELECT * FROM songs")
 	if err != nil {
 		return songs, err
 	}

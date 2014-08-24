@@ -9,26 +9,22 @@ import (
 )
 
 type DB struct {
-	Conn *sql.DB
+	Handle *sql.DB
 }
 
-func (db *DB) Open() (err error) {
-	db.Conn, err = sql.Open(config.Entry("Driver"),
+func NewDB() (db *DB, err error) {
+	handle, err := sql.Open(config.Entry("Driver"),
 		config.Entry("Username")+":"+config.Entry("Password")+"@/"+config.Entry("Database"))
 
 	if err != nil {
-		tracelog.CompletedError(err, "DB", "Open")
-		return err
+		tracelog.CompletedError(err, "DB", "NewDB")
+		return &DB{Handle: nil}, err
 	}
-	err = db.Conn.Ping()
+	err = handle.Ping()
 	if err != nil {
-		tracelog.CompletedError(err, "DB", "db.Conn.Ping")
-		return err
+		tracelog.CompletedError(err, "DB", "handle.Ping")
+		return &DB{Handle: nil}, err
 	}
 
-	return nil
-}
-
-func (db *DB) Close() {
-	db.Conn.Close()
+	return &DB{Handle: handle}, nil
 }

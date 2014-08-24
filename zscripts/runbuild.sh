@@ -1,5 +1,5 @@
-cd $GOPATH/src/bitbucket.org/adred/cloud-music-player
+cd $GOPATH/src/bitbucket.org/adred/wiki-player
 go clean -i
 go build
 
-./cloud-music-player
+./wiki-player
