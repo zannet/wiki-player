@@ -32,8 +32,10 @@ func main() {
 	sc := &controllers.SongController{SM: sm}
 	nc := &controllers.NonceController{NM: nm}
 
+	// Init Gin
 	mux := gin.Default()
 
+	// Setup routes
 	mux.GET("/", sc.Index)
 	mux.GET("/nonce", nc.Create)
 
