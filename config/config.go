@@ -27,6 +27,7 @@ type (
 		Username string
 		Password string
 		LogDir   string
+		Salt     string
 	}
 )
 

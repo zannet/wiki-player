@@ -16,7 +16,7 @@ func main() {
 	// Start logger
 	tracelog.StartFile(1, config.Entry("LogDir"), 1)
 
-	// Create new DB
+	// Create DB connection
 	db, err := utils.NewDB()
 	if err != nil {
 		os.Exit(1)
@@ -24,15 +24,20 @@ func main() {
 	// Close DB
 	defer db.Handle.Close()
 
-	// Init SongModel
+	// Init Models
 	sm := &models.SongModel{DB: db}
-	// Init SongController
+	nm := &models.NonceModel{DB: db}
+
+	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
+	nc := &controllers.NonceController{NM: nm}
 
 	mux := gin.Default()
-	mux.GET("/", sc.Index)
 
-	// Listen and server on 0.0.0.0:8080
+	mux.GET("/", sc.Index)
+	mux.GET("/nonce", nc.Create)
+
+	// Listen and serve on 0.0.0.0:8080
 	mux.Run(":8080")
 
 	tracelog.Stop()

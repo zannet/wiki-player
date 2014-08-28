@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"net/http"
-
 	"bitbucket.org/adred/wiki-player/models"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
@@ -16,11 +14,10 @@ func (sc *SongController) Index(c *gin.Context) {
 	songs, err := sc.SM.GetAll()
 	if err != nil {
 		tracelog.CompletedError(err, "SongController", "Index")
-		http.Error(c.Writer, http.StatusText(http.StatusInternalServerError),
-			http.StatusInternalServerError)
+		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 
-	c.JSON(http.StatusOK, songs)
+	c.JSON(200, gin.H{"songs": songs})
 }
 
 func (sc *SongController) Get(c *gin.Context) {

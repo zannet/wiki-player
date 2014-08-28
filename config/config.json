@@ -4,5 +4,6 @@
 	"Driver": "mysql",
 	"Username": "root",
 	"Password": "redeye",
-	"LogDir": "/home/adred/Golang/src/bitbucket.org/adred/wiki-player/log"
+	"LogDir": "/home/adred/Golang/src/bitbucket.org/adred/wiki-player/log",
+	"Salt": "Narred"
 }
