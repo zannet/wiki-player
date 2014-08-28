@@ -15,6 +15,8 @@ func (nc *NonceController) Create(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "NonceController", "Create")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+
+		return
 	}
 
 	c.JSON(200, gin.H{"nonce": nonce})

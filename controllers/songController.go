@@ -15,6 +15,8 @@ func (sc *SongController) Index(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "SongController", "Index")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+
+		return
 	}
 
 	c.JSON(200, gin.H{"songs": songs})
