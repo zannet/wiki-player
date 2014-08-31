@@ -1,4 +1,4 @@
-package config
+package utils
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 )
 
 type (
-	singleton struct {
+	configSingleton struct {
 		once  sync.Once
 		value configMap
 	}
@@ -31,9 +31,9 @@ type (
 	}
 )
 
-var ci singleton
+var ci configSingleton
 
-func MustLoad() {
+func MustLoadConfig() {
 	ci.once.Do(func() {
 		// Find the location of the config.json file
 		configFilePath, err := filepath.Abs("config/config.json")
@@ -41,7 +41,7 @@ func MustLoad() {
 		// Open the config.json file
 		file, err := os.Open(configFilePath)
 		if err != nil {
-			tracelog.CompletedError(err, "MustLoad", "os.Open")
+			tracelog.CompletedError(err, "MustLoadConfig", "os.Open")
 			panic(err.Error())
 		}
 		defer file.Close()
@@ -67,7 +67,7 @@ func MustLoad() {
 	})
 }
 
-func Entry(key string) string {
-	MustLoad()
+func ConfigEntry(key string) string {
+	MustLoadConfig()
 	return ci.value.ConfigMap[key]
 }

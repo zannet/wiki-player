@@ -2,29 +2,40 @@ package utils
 
 import (
 	"database/sql"
+	"sync"
 
-	"bitbucket.org/adred/wiki-player/config"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/goinggo/tracelog"
 )
 
-type DB struct {
-	Handle *sql.DB
+type (
+	dbSingleton struct {
+		once  sync.Once
+		value *sql.DB
+	}
+)
+
+var handle dbSingleton
+
+func MustLoadDB() {
+	handle.once.Do(func() {
+		conn, err := sql.Open(ConfigEntry("Driver"),
+			ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+ConfigEntry("Database"))
+		if err != nil {
+			tracelog.CompletedError(err, "MustLoadDB", "sql.Open")
+			panic(err.Error())
+		}
+
+		handle.value = conn
+		err = handle.value.Ping()
+		if err != nil {
+			tracelog.CompletedError(err, "MustLoadDB", "handle.value.Ping")
+			panic(err.Error())
+		}
+	})
 }
 
-func NewDB() (*DB, error) {
-	handle, err := sql.Open(config.Entry("Driver"),
-		config.Entry("Username")+":"+config.Entry("Password")+"@/"+config.Entry("Database"))
-
-	if err != nil {
-		tracelog.CompletedError(err, "DB", "NewDB")
-		return &DB{Handle: nil}, err
-	}
-	err = handle.Ping()
-	if err != nil {
-		tracelog.CompletedError(err, "DB", "handle.Ping")
-		return &DB{Handle: nil}, err
-	}
-
-	return &DB{Handle: handle}, nil
+func DBHandle() *sql.DB {
+	MustLoadDB()
+	return handle.value
 }

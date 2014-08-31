@@ -1,9 +1,6 @@
 package main
 
 import (
-	"os"
-
-	"bitbucket.org/adred/wiki-player/config"
 	"bitbucket.org/adred/wiki-player/controllers"
 	"bitbucket.org/adred/wiki-player/models"
 	"bitbucket.org/adred/wiki-player/utils"
@@ -14,22 +11,21 @@ import (
 // Our main go routine
 func main() {
 	// Start logger
-	tracelog.StartFile(1, config.Entry("LogDir"), 1)
+	tracelog.StartFile(1, utils.ConfigEntry("LogDir"), 1)
 
 	// Create DB connection
-	db, err := utils.NewDB()
-	if err != nil {
-		os.Exit(1)
-	}
+	dbHandle := utils.DBHandle()
 	// Close DB
-	defer db.Handle.Close()
+	defer dbHandle.Close()
 
 	// Init Models
-	sm := &models.SongModel{DB: db}
-	nm := &models.NonceModel{DB: db}
+	sm := &models.SongModel{DBHandle: dbHandle}
+	cm := &models.ClientModel{DBHandle: dbHandle}
+	nm := &models.NonceModel{DBHandle: dbHandle}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
+	cc := &controllers.ClientController{CM: cm}
 	nc := &controllers.NonceController{NM: nm}
 
 	// Init Gin
@@ -37,6 +33,7 @@ func main() {
 
 	// Setup routes
 	mux.GET("/", sc.Index)
+	mux.GET("/client", cc.Index)
 	mux.GET("/nonce", nc.Create)
 
 	// Listen and serve on 0.0.0.0:8080

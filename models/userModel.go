@@ -1,12 +1,12 @@
 package models
 
 import (
-	"bitbucket.org/adred/wiki-player/utils"
+	"database/sql"
 )
 
 type (
 	UserModel struct {
-		DB *utils.DB
+		DBHandle *sql.DB
 	}
 
 	user struct {
