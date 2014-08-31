@@ -66,9 +66,8 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Hash request body
-		var hashable Hashable
-		c.Bind(&hashable) // ---------------------------------------->>>> This causes the error. Investigate!
-		payload, err := json.Marshal(hashable)
+		h := Hashable{Nonce: j.Nonce, ApiKey: j.ApiKey}
+		payload, err := json.Marshal(h)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "json.Marshal")
 			c.JSON(401, gin.H{"message": "Couldn't marshal request body.", "status": 401})
@@ -76,9 +75,13 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Check validity of Hash
+		// Client's json request body must be in the form
+		// {Nonce:"123abc",ApiKey:"abc123"} before hashing it
+		// TODO: A more secure hash would be to include the request params in the hash
 		var hashMismatch = errors.New("Hashes do not match.")
 		hash := computeHmac256(string(payload), privateKey)
-		if j.Hash == hash {
+
+		if j.Hash != hash {
 			tracelog.CompletedError(hashMismatch, "ClientAuth", "Hashes comparison")
 			c.JSON(401, gin.H{"message": "Hashes do not match.", "status": 401})
 			c.Abort(401)
