@@ -5,7 +5,8 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
-	"fmt"
+	"encoding/json"
+	"errors"
 
 	"bitbucket.org/adred/wiki-player/models"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,12 @@ import (
 type ClientJSON struct {
 	Nonce  string `json:"nonce" binding:"required"`
 	ApiKey string `json:"apiKey" binding:"required"`
-	// Hash   string `json:"hash" binding:"required"`
+	Hash   string `json:"hash" binding:"required"`
+}
+
+type Hashable struct {
+	Nonce  string
+	ApiKey string
 }
 
 func computeHmac256(message string, secret string) string {
@@ -29,13 +35,13 @@ func computeHmac256(message string, secret string) string {
 
 func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var json ClientJSON
+		var j ClientJSON
 
-		c.Bind(&json)
+		c.Bind(&j)
 
 		// Check validity of Nonce
 		nm := &models.NonceModel{DBHandle: dbHandle}
-		ok, err := nm.Verify(json.Nonce)
+		_, err := nm.Verify(j.Nonce)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "nm.Verify")
 			c.JSON(401, gin.H{"message": "Invalid nonce.", "status": 401})
@@ -44,17 +50,38 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 
 		// Check validity of ApiKey
 		cm := &models.ClientModel{DBHandle: dbHandle}
-		ok, err = cm.Verify(json.ApiKey)
+		_, err = cm.Verify(j.ApiKey)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "cm.Verify")
 			c.JSON(401, gin.H{"message": "Invalid api key.", "status": 401})
 			c.Abort(401)
 		}
 
+		// Get private key
+		privateKey, err := cm.PrivateKey(j.ApiKey)
+		if err != nil {
+			tracelog.CompletedError(err, "ClientAuth", "cm.PrivateKey")
+			c.JSON(401, gin.H{"message": "Couldn't retrieve the private key.", "status": 401})
+			c.Abort(401)
+		}
+
+		// Hash request body
+		var hashable Hashable
+		c.Bind(&hashable) // ---------------------------------------->>>> This causes the error. Investigate!
+		payload, err := json.Marshal(hashable)
+		if err != nil {
+			tracelog.CompletedError(err, "ClientAuth", "json.Marshal")
+			c.JSON(401, gin.H{"message": "Couldn't marshal request body.", "status": 401})
+			c.Abort(401)
+		}
+
 		// Check validity of Hash
-		//hash := computeHmac256(c.Request.URL)
-		pkey, _ := cm.PrivateKey(json.ApiKey)
-		fmt.Println(pkey)
-		fmt.Println(ok)
+		var hashMismatch = errors.New("Hashes do not match.")
+		hash := computeHmac256(string(payload), privateKey)
+		if j.Hash == hash {
+			tracelog.CompletedError(hashMismatch, "ClientAuth", "Hashes comparison")
+			c.JSON(401, gin.H{"message": "Hashes do not match.", "status": 401})
+			c.Abort(401)
+		}
 	}
 }
