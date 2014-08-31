@@ -2,6 +2,7 @@ package main
 
 import (
 	"bitbucket.org/adred/wiki-player/controllers"
+	"bitbucket.org/adred/wiki-player/middlewares"
 	"bitbucket.org/adred/wiki-player/models"
 	"bitbucket.org/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
@@ -31,9 +32,12 @@ func main() {
 	// Init Gin
 	mux := gin.Default()
 
+	// Middlewares
+	mux.Use(middlewares.ClientAuth(dbHandle))
+
 	// Setup routes
 	mux.GET("/", sc.Index)
-	mux.GET("/client", cc.Index)
+	mux.POST("/client", cc.Index)
 	mux.GET("/nonce", nc.Create)
 
 	// Listen and serve on 0.0.0.0:8080

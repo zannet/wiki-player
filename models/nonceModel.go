@@ -32,7 +32,7 @@ func (nm *NonceModel) Create() (string, error) {
 }
 
 func (nm *NonceModel) Verify(nonce string) (bool, error) {
-	stmt, err := nm.DBHandle.Prepare("SELECT id FROM nonces WHERE key = ?")
+	stmt, err := nm.DBHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
 	if err != nil {
 		return false, err
 	}

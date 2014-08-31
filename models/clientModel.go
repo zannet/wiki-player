@@ -11,7 +11,7 @@ type (
 	ClientModel struct {
 		DBHandle *sql.DB
 	}
-
+	// Table structure
 	client struct {
 		Id         string
 		UserId     string
@@ -52,6 +52,21 @@ func (cm *ClientModel) Verify(apiKey string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (cm *ClientModel) PrivateKey(apiKey string) (string, error) {
+	stmt, err := cm.DBHandle.Prepare("SELECT privateKey FROM clients WHERE apiKey = ?")
+	if err != nil {
+		return "", err
+	}
+
+	var privateKey string
+	err = stmt.QueryRow(apiKey).Scan(&privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	return privateKey, nil
 }
 
 func (cm *ClientModel) Delete(id string) error {
