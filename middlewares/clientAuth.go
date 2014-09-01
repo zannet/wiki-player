@@ -80,7 +80,6 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		// Client also must hash a JSON {Nonce:"abc123",ApiKey:"abc123"} with a private key
 		var hashMismatch = errors.New("Hashes do not match.")
 		hash := computeHmac256(string(payload), privateKey)
-
 		if p.Hash != hash {
 			tracelog.CompletedError(hashMismatch, "ClientAuth", "Hashes comparison")
 			c.JSON(401, gin.H{"message": "Hashes do not match.", "status": 401})
