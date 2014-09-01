@@ -75,9 +75,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Check validity of Hash
-		// Client's json request body must be in the form
-		// {Nonce:"123abc",ApiKey:"abc123"} before hashing it
-		// TODO: A more secure hash would be to include the request params in the hash
+		// Client also must hash a JSON {Nonce:"abc123",ApiKey:"abc123"} with a private key
 		var hashMismatch = errors.New("Hashes do not match.")
 		hash := computeHmac256(string(payload), privateKey)
 
