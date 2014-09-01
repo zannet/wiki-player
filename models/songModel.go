@@ -6,7 +6,7 @@ import (
 
 type (
 	SongModel struct {
-		DBHandle *sql.DB
+		DbHandle *sql.DB
 	}
 
 	song struct {
@@ -22,7 +22,7 @@ type (
 func (sm *SongModel) GetAll() ([]*song, error) {
 	songs := []*song{}
 
-	stmt, err := sm.DBHandle.Prepare("SELECT * FROM songs")
+	stmt, err := sm.DbHandle.Prepare("SELECT * FROM songs")
 	if err != nil {
 		return songs, err
 	}

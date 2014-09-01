@@ -1,48 +1,37 @@
 package middlewares
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
 	"database/sql"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 
 	"bitbucket.org/adred/wiki-player/models"
+	"bitbucket.org/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 )
 
-// Binding from JSON
 type (
-	Params struct {
+	ClientParams struct {
 		Nonce  string `json:"nonce" binding:"required"`
 		ApiKey string `json:"apiKey" binding:"required"`
 		Hash   string `json:"hash" binding:"required"`
 	}
 
-	HashableParams struct {
+	ClientHashableParams struct {
 		Nonce  string
 		ApiKey string
 	}
 )
 
-func computeHmac256(message string, secret string) string {
-	key := []byte(secret)
-	h := hmac.New(sha256.New, key)
-	h.Write([]byte(message))
-
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
-}
-
 func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var p Params
+		var p ClientParams
 
 		c.Bind(&p)
 
 		// Check validity of Nonce
-		nm := &models.NonceModel{DBHandle: dbHandle}
+		nm := &models.NonceModel{DbHandle: dbHandle}
 		_, err := nm.Verify(p.Nonce)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "nm.Verify")
@@ -51,7 +40,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Check validity of ApiKey
-		cm := &models.ClientModel{DBHandle: dbHandle}
+		cm := &models.ClientModel{DbHandle: dbHandle}
 		_, err = cm.Verify(p.ApiKey)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "cm.Verify")
@@ -68,7 +57,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Hash request body
-		hp := HashableParams{Nonce: p.Nonce, ApiKey: p.ApiKey}
+		hp := ClientHashableParams{Nonce: p.Nonce, ApiKey: p.ApiKey}
 		payload, err := json.Marshal(&hp)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "json.Marshal")
@@ -79,7 +68,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		// Check validity of Hash
 		// Client also must hash a JSON {Nonce:"abc123",ApiKey:"abc123"} with a private key
 		var hashMismatch = errors.New("Hashes do not match.")
-		hash := computeHmac256(string(payload), privateKey)
+		hash := utils.ComputeHmac256(string(payload), privateKey)
 		if p.Hash != hash {
 			tracelog.CompletedError(hashMismatch, "ClientAuth", "Hashes comparison")
 			c.JSON(401, gin.H{"message": "Hashes do not match.", "status": 401})

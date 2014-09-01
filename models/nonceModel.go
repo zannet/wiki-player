@@ -9,12 +9,12 @@ import (
 
 type (
 	NonceModel struct {
-		DBHandle *sql.DB
+		DbHandle *sql.DB
 	}
 )
 
 func (nm *NonceModel) Create() (string, error) {
-	stmt, err := nm.DBHandle.Prepare("INSERT INTO nonces VALUES ('', ?, ?, ?)")
+	stmt, err := nm.DbHandle.Prepare("INSERT INTO nonces VALUES ('', ?, ?, ?)")
 	if err != nil {
 		return "", err
 	}
@@ -32,7 +32,7 @@ func (nm *NonceModel) Create() (string, error) {
 }
 
 func (nm *NonceModel) Verify(nonce string) (bool, error) {
-	stmt, err := nm.DBHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
+	stmt, err := nm.DbHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
 	if err != nil {
 		return false, err
 	}
@@ -46,7 +46,7 @@ func (nm *NonceModel) Verify(nonce string) (bool, error) {
 }
 
 func (nm *NonceModel) Delete(id string) error {
-	stmt, err := nm.DBHandle.Prepare("DELETE FROM nonces WHERE id = ?")
+	stmt, err := nm.DbHandle.Prepare("DELETE FROM nonces WHERE id = ?")
 	if err != nil {
 		return err
 	}

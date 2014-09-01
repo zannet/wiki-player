@@ -9,7 +9,7 @@ import (
 
 type (
 	ClientModel struct {
-		DBHandle *sql.DB
+		DbHandle *sql.DB
 	}
 	// Table structure
 	client struct {
@@ -23,7 +23,7 @@ type (
 )
 
 func (cm *ClientModel) Register(userId string, clientName string) (map[string]string, error) {
-	stmt, err := cm.DBHandle.Prepare("INSERT INTO clients VALUES ('', ?, ?, ?, ?, ?)")
+	stmt, err := cm.DbHandle.Prepare("INSERT INTO clients VALUES ('', ?, ?, ?, ?, ?)")
 	if err != nil {
 		return map[string]string{}, err
 	}
@@ -41,7 +41,7 @@ func (cm *ClientModel) Register(userId string, clientName string) (map[string]st
 }
 
 func (cm *ClientModel) Verify(apiKey string) (bool, error) {
-	stmt, err := cm.DBHandle.Prepare("SELECT id FROM clients WHERE apiKey = ?")
+	stmt, err := cm.DbHandle.Prepare("SELECT id FROM clients WHERE apiKey = ?")
 	if err != nil {
 		return false, err
 	}
@@ -55,7 +55,7 @@ func (cm *ClientModel) Verify(apiKey string) (bool, error) {
 }
 
 func (cm *ClientModel) PrivateKey(apiKey string) (string, error) {
-	stmt, err := cm.DBHandle.Prepare("SELECT privateKey FROM clients WHERE apiKey = ?")
+	stmt, err := cm.DbHandle.Prepare("SELECT privateKey FROM clients WHERE apiKey = ?")
 	if err != nil {
 		return "", err
 	}
@@ -70,7 +70,7 @@ func (cm *ClientModel) PrivateKey(apiKey string) (string, error) {
 }
 
 func (cm *ClientModel) Delete(id string) error {
-	stmt, err := cm.DBHandle.Prepare("DELETE FROM clients WHERE id = ?")
+	stmt, err := cm.DbHandle.Prepare("DELETE FROM clients WHERE id = ?")
 	if err != nil {
 		return err
 	}

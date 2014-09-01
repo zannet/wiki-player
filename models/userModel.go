@@ -6,7 +6,7 @@ import (
 
 type (
 	UserModel struct {
-		DBHandle *sql.DB
+		DbHandle *sql.DB
 	}
 
 	user struct {

@@ -15,14 +15,14 @@ func main() {
 	tracelog.StartFile(1, utils.ConfigEntry("LogDir"), 1)
 
 	// Create DB connection
-	dbHandle := utils.DBHandle()
+	dbHandle := utils.DbHandle()
 	// Close DB
 	defer dbHandle.Close()
 
 	// Init Models
-	sm := &models.SongModel{DBHandle: dbHandle}
-	cm := &models.ClientModel{DBHandle: dbHandle}
-	nm := &models.NonceModel{DBHandle: dbHandle}
+	sm := &models.SongModel{DbHandle: dbHandle}
+	cm := &models.ClientModel{DbHandle: dbHandle}
+	nm := &models.NonceModel{DbHandle: dbHandle}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
@@ -34,8 +34,9 @@ func main() {
 
 	// Middlewares
 	mux.Use(middlewares.ClientAuth(dbHandle))
+	//mux.Use(middlewares.UserAuth(dbHandle))
 
-	// Setup routes
+	// Routes
 	mux.GET("/", sc.Index)
 	mux.POST("/client", cc.Index)
 	mux.GET("/nonce", nc.Create)

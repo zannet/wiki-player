@@ -35,7 +35,7 @@ func MustLoadDB() {
 	})
 }
 
-func DBHandle() *sql.DB {
+func DbHandle() *sql.DB {
 	MustLoadDB()
 	return handle.value
 }
