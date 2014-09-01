@@ -14,16 +14,18 @@ import (
 )
 
 // Binding from JSON
-type ClientJSON struct {
-	Nonce  string `json:"nonce" binding:"required"`
-	ApiKey string `json:"apiKey" binding:"required"`
-	Hash   string `json:"hash" binding:"required"`
-}
+type (
+	Params struct {
+		Nonce  string `json:"nonce" binding:"required"`
+		ApiKey string `json:"apiKey" binding:"required"`
+		Hash   string `json:"hash" binding:"required"`
+	}
 
-type Hashable struct {
-	Nonce  string
-	ApiKey string
-}
+	HashableParams struct {
+		Nonce  string
+		ApiKey string
+	}
+)
 
 func computeHmac256(message string, secret string) string {
 	key := []byte(secret)
@@ -35,13 +37,13 @@ func computeHmac256(message string, secret string) string {
 
 func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var j ClientJSON
+		var p Params
 
-		c.Bind(&j)
+		c.Bind(&p)
 
 		// Check validity of Nonce
 		nm := &models.NonceModel{DBHandle: dbHandle}
-		_, err := nm.Verify(j.Nonce)
+		_, err := nm.Verify(p.Nonce)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "nm.Verify")
 			c.JSON(401, gin.H{"message": "Invalid nonce.", "status": 401})
@@ -50,7 +52,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 
 		// Check validity of ApiKey
 		cm := &models.ClientModel{DBHandle: dbHandle}
-		_, err = cm.Verify(j.ApiKey)
+		_, err = cm.Verify(p.ApiKey)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "cm.Verify")
 			c.JSON(401, gin.H{"message": "Invalid api key.", "status": 401})
@@ -58,7 +60,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Get private key
-		privateKey, err := cm.PrivateKey(j.ApiKey)
+		privateKey, err := cm.PrivateKey(p.ApiKey)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "cm.PrivateKey")
 			c.JSON(401, gin.H{"message": "Couldn't retrieve the private key.", "status": 401})
@@ -66,8 +68,8 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		}
 
 		// Hash request body
-		h := Hashable{Nonce: j.Nonce, ApiKey: j.ApiKey}
-		payload, err := json.Marshal(h)
+		hp := HashableParams{Nonce: p.Nonce, ApiKey: p.ApiKey}
+		payload, err := json.Marshal(&hp)
 		if err != nil {
 			tracelog.CompletedError(err, "ClientAuth", "json.Marshal")
 			c.JSON(401, gin.H{"message": "Couldn't marshal request body.", "status": 401})
@@ -79,7 +81,7 @@ func ClientAuth(dbHandle *sql.DB) gin.HandlerFunc {
 		var hashMismatch = errors.New("Hashes do not match.")
 		hash := computeHmac256(string(payload), privateKey)
 
-		if j.Hash != hash {
+		if p.Hash != hash {
 			tracelog.CompletedError(hashMismatch, "ClientAuth", "Hashes comparison")
 			c.JSON(401, gin.H{"message": "Hashes do not match.", "status": 401})
 			c.Abort(401)
