@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"time"
+
 	"bitbucket.org/adred/wiki-player/models"
 	"bitbucket.org/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
@@ -34,7 +36,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	c.Bind(&g)
 
 	// Check if user exists and get instance if it does
-	u, err := uc.UM.Get("email", g.Email)
+	ud, err := uc.UM.Get("email", g.Email)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
 		c.JSON(401, gin.H{"message": "Invalid email.", "status": 401})
@@ -42,49 +44,43 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	// Compare hashes
 	hash := utils.ComputeHmac256(g.Password, utils.ConfigEntry("Salt"))
-	if hash != u.Hash {
+	if hash != ud.Hash {
 		tracelog.CompletedError(err, "UserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 	}
 
 	// Set session
-	ud := map[string]string{"id": u.Id, "email": u.Email, "username": u.Username, "firstName": u.FirstName,
-		"lastName": u.LastName, "accessLevel": 10}
-	err = uc.setSession(c, ud)
+	uc.UM.UserData = ud
+	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 }
 
-func (sc *UserController) Register(c *gin.Context) {
+func (uc *UserController) Register(c *gin.Context) {
 	// Bind params
 	var r Register
 	c.Bind(&r)
 
-	// Create password hash
-	hash := utils.ComputeHmac256(r.Password, utils.ConfigEntry("Salt"))
-
 	// Set user data
-	sc.UM.UserData.Email = r.Email
-	sc.UM.UserData.Username = r.Username
-	sc.UM.UserData.FirstName = r.FirstName
-	sc.UM.UserData.LastName = r.LastName
-	sc.UM.UserData.Hash = hash
-	sc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
-	sc.UM.UserData.Joined = time.Now().Local()
+	uc.UM.UserData.Email = r.Email
+	uc.UM.UserData.Username = r.Username
+	uc.UM.UserData.FirstName = r.FirstName
+	uc.UM.UserData.LastName = r.LastName
+	uc.UM.UserData.Hash = utils.ComputeHmac256(r.Password, utils.ConfigEntry("Salt"))
+	uc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
+	uc.UM.UserData.Joined = time.Now().Local()
 
 	// Save user
-	id, err := sc.UM.Save()
+	id, err := uc.UM.Save()
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "sc.UM.Save")
+		tracelog.CompletedError(err, "UserController", "uc.UM.Save")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 
 	// Set session
-	ud := map[string]string{"id": id, "email": r.Email, "username": r.Username, "firstName": r.FirstName,
-		"lastName": r.LastName, "accessLevel": 10}
-	err = uc.setSession(c, ud)
+	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -94,17 +90,17 @@ func (sc *UserController) Register(c *gin.Context) {
 
 }
 
-func (uc *UserController) setSession(c *gin.Context, ud map[string]string) (err error) {
+func (uc *UserController) setSession(c *gin.Context) (err error) {
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, "session")
 
 	// Set some session values
-	session.Values["uid"] = ud["id"]
-	session.Values["email"] = ud["email"]
-	session.Values["username"] = ud["username"]
-	session.Values["firstName"] = ud["firstName"]
-	session.Values["lastName"] = ud["lastName"]
-	session.Values["accessLevel"] = ud["accessLevel"]
+	session.Values["uid"] = uc.UM.Userdata.Id
+	session.Values["email"] = uc.UM.Userdata.Email
+	session.Values["username"] = uc.UM.Userdata.Username
+	session.Values["firstName"] = uc.UM.Userdata.FirstName
+	session.Values["lastName"] = uc.UM.Userdata.LastName
+	session.Values["accessLevel"] = uc.UM.Userdata.AccessLevel
 
 	// Save session
 	err = session.Save(c.Request, c.Writer)
