@@ -56,6 +56,8 @@ func (uc *UserController) Login(c *gin.Context) {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
+
+	c.JSON(200, gin.H{"message": "Logged in successfully.", "status": 200})
 }
 
 func (uc *UserController) Register(c *gin.Context) {
@@ -89,11 +91,13 @@ func (uc *UserController) Register(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 
-	// Redirect user to home page
-
+	c.JSON(200, gin.H{"message": "Registered successfully.", "status": 200})
 }
 
 func (uc *UserController) setSession(c *gin.Context) (err error) {
+	// TODO: Figure out how to use context.ClearHandler to prevent memory leak.
+	// See http://www.gorillatoolkit.org/pkg/sessions
+
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, "session")
 
