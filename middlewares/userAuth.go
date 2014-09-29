@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"database/sql"
+	// "database/sql"
 	// "encoding/json"
 	// "errors"
 

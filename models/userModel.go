@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"strconv"
+	"time"
 )
 
 type (
@@ -18,8 +19,8 @@ type (
 		FirstName   string
 		LastName    string
 		Hash        string
-		AccessLevel string
-		Joined      string
+		AccessLevel int
+		Joined      time.Time
 	}
 )
 
@@ -33,7 +34,9 @@ func (um UserModel) Get(field, value string) (ud *userData, err error) {
 		return &userData{}, err
 	}
 
-	var id, email, username, firstName, lastName, hash, accessLevel, joined string
+	var accessLevel int
+	var joined time.Time
+	var id, email, username, firstName, lastName, hash string
 	err = stmt.QueryRow(value).Scan(&id, &email, &username, &firstName, &lastName, &hash, &accessLevel, &joined)
 	if err != nil {
 		return &userData{}, err

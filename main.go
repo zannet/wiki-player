@@ -2,7 +2,7 @@ package main
 
 import (
 	"bitbucket.org/adred/wiki-player/controllers"
-	"bitbucket.org/adred/wiki-player/middlewares"
+	// "bitbucket.org/adred/wiki-player/middlewares"
 	"bitbucket.org/adred/wiki-player/models"
 	"bitbucket.org/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
@@ -44,7 +44,7 @@ func main() {
 
 	// Middlewares
 	// mux.Use(middlewares.ClientAuth(dbHandle))
-	mux.Use(middlewares.UserAuth(dbHandle))
+	// mux.Use(middlewares.UserAuth(dbHandle))
 
 	// Routes
 	mux.GET("/", sc.Index)

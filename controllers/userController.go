@@ -79,6 +79,9 @@ func (uc *UserController) Register(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 
+	// Set user id
+	uc.UM.UserData.Id = id
+
 	// Set session
 	err = uc.setSession(c)
 	if err != nil {
@@ -95,12 +98,12 @@ func (uc *UserController) setSession(c *gin.Context) (err error) {
 	session, _ := uc.Store.Get(c.Request, "session")
 
 	// Set some session values
-	session.Values["uid"] = uc.UM.Userdata.Id
-	session.Values["email"] = uc.UM.Userdata.Email
-	session.Values["username"] = uc.UM.Userdata.Username
-	session.Values["firstName"] = uc.UM.Userdata.FirstName
-	session.Values["lastName"] = uc.UM.Userdata.LastName
-	session.Values["accessLevel"] = uc.UM.Userdata.AccessLevel
+	session.Values["uid"] = uc.UM.UserData.Id
+	session.Values["email"] = uc.UM.UserData.Email
+	session.Values["username"] = uc.UM.UserData.Username
+	session.Values["firstName"] = uc.UM.UserData.FirstName
+	session.Values["lastName"] = uc.UM.UserData.LastName
+	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
 
 	// Save session
 	err = session.Save(c.Request, c.Writer)
