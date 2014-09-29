@@ -11,7 +11,7 @@ type (
 	ClientModel struct {
 		DbHandle *sql.DB
 	}
-	// Table structure
+
 	client struct {
 		Id         string
 		UserId     string
@@ -22,7 +22,7 @@ type (
 	}
 )
 
-func (cm *ClientModel) Register(userId string, clientName string) (map[string]string, error) {
+func (cm *ClientModel) Register(userId, clientName string) (map[string]string, error) {
 	stmt, err := cm.DbHandle.Prepare("INSERT INTO clients VALUES ('', ?, ?, ?, ?, ?)")
 	if err != nil {
 		return map[string]string{}, err
