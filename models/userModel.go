@@ -9,10 +9,10 @@ import (
 type (
 	UserModel struct {
 		DbHandle *sql.DB
-		UserData *userData
+		UserData *UserData
 	}
 
-	userData struct {
+	UserData struct {
 		Id          string
 		Email       string
 		Username    string
@@ -24,14 +24,14 @@ type (
 	}
 )
 
-func (um UserModel) Get(field, value string) (ud *userData, err error) {
+func (um UserModel) Get(field, value string) (ud *UserData, err error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined WHERE "
 	query += field
 	query += " = ?"
 
 	stmt, err := um.DbHandle.Prepare(query)
 	if err != nil {
-		return &userData{}, err
+		return &UserData{}, err
 	}
 
 	var accessLevel int
@@ -39,10 +39,10 @@ func (um UserModel) Get(field, value string) (ud *userData, err error) {
 	var id, email, username, firstName, lastName, hash string
 	err = stmt.QueryRow(value).Scan(&id, &email, &username, &firstName, &lastName, &hash, &accessLevel, &joined)
 	if err != nil {
-		return &userData{}, err
+		return &UserData{}, err
 	}
 
-	return &userData{
+	return &UserData{
 		Id:          id,
 		Email:       email,
 		Username:    username,
@@ -60,7 +60,7 @@ func (um UserModel) Save() (id string, err error) {
 		return "", err
 	}
 
-	res, err := stmt.Exec("", um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
 		um.UserData.Hash, um.UserData.AccessLevel, um.UserData.Joined)
 	if err != nil {
 		return "", err

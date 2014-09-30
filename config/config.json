@@ -1,6 +1,6 @@
 {
 	"Host": "localhost",
-	"Database": "gojimusic",
+	"Database": "wikiplayer",
 	"Driver": "mysql",
 	"Username": "root",
 	"Password": "redeye",

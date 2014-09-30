@@ -31,11 +31,11 @@ type (
 )
 
 func (uc *UserController) Login(c *gin.Context) {
-	// Bind params
 	var g Login
+	// Bind params
 	c.Bind(&g)
 
-	// Check if user exists and get instance if it does
+	// Check if user exists and get UserData instance if it does
 	ud, err := uc.UM.Get("email", g.Email)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
@@ -61,8 +61,8 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 func (uc *UserController) Register(c *gin.Context) {
-	// Bind params
 	var r Register
+	// Bind params
 	c.Bind(&r)
 
 	// Set user data
@@ -81,7 +81,7 @@ func (uc *UserController) Register(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 	}
 
-	// Set user id
+	// Set user ID to last inserted ID
 	uc.UM.UserData.Id = id
 
 	// Set session

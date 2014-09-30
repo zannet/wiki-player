@@ -29,13 +29,13 @@ func main() {
 
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
-	cm := &models.ClientModel{DbHandle: dbHandle}
+	// cm := &models.ClientModel{DbHandle: dbHandle}
 	// nm := &models.NonceModel{DbHandle: dbHandle}
-	um := &models.UserModel{DbHandle: dbHandle}
+	um := &models.UserModel{DbHandle: dbHandle, UserData: &models.UserData{}}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
-	cc := &controllers.ClientController{CM: cm}
+	// cc := &controllers.ClientController{CM: cm}
 	// nc := &controllers.NonceController{NM: nm}
 	uc := &controllers.UserController{UM: um, Store: store}
 
@@ -48,10 +48,9 @@ func main() {
 
 	// Routes
 	mux.GET("/", sc.Index)
-	mux.POST("/client", cc.Index)
-	// mux.GET("/nonce", nc.Create)
-	mux.GET("/user/login", uc.Login)
-	// mux.POST("/user/register", uc.Register)
+	// mux.POST("/client", cc.Index) // mux.GET("/nonce", nc.Create)
+	mux.POST("/users/login", uc.Login)
+	mux.POST("/users/register", uc.Register)
 
 	// Listen and serve on 0.0.0.0:8080
 	mux.Run(":8080")
