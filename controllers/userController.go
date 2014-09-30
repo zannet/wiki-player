@@ -95,9 +95,6 @@ func (uc *UserController) Register(c *gin.Context) {
 }
 
 func (uc *UserController) setSession(c *gin.Context) (err error) {
-	// TODO: Figure out how to use context.ClearHandler to prevent memory leak.
-	// See http://www.gorillatoolkit.org/pkg/sessions
-
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, "session")
 
