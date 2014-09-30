@@ -1,12 +1,15 @@
 package main
 
 import (
+	"net/http"
+
 	"bitbucket.org/adred/wiki-player/controllers"
 	// "bitbucket.org/adred/wiki-player/middlewares"
 	"bitbucket.org/adred/wiki-player/models"
 	"bitbucket.org/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
+	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 )
 
@@ -53,7 +56,7 @@ func main() {
 	mux.POST("/users/register", uc.Register)
 
 	// Listen and serve on 0.0.0.0:8080
-	mux.Run(":8080")
+	http.ListenAndServe(":8080", context.ClearHandler(mux))
 
 	tracelog.Stop()
 }
