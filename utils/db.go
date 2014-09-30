@@ -20,7 +20,7 @@ var handle dbSingleton
 func MustLoadDB() {
 	handle.once.Do(func() {
 		conn, err := sql.Open(ConfigEntry("Driver"),
-			ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+ConfigEntry("Database"))
+			ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+ConfigEntry("Database")+"?parseTime=true")
 		if err != nil {
 			tracelog.CompletedError(err, "MustLoadDB", "sql.Open")
 			panic(err.Error())

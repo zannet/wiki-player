@@ -25,7 +25,7 @@ type (
 )
 
 func (um UserModel) Get(field, value string) (ud *UserData, err error) {
-	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined WHERE "
+	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
 

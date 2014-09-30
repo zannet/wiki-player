@@ -40,6 +40,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
 		c.JSON(401, gin.H{"message": "Invalid email.", "status": 401})
+		return
 	}
 
 	// Compare hashes
@@ -47,6 +48,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	if hash != ud.Hash {
 		tracelog.CompletedError(err, "UserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
+		return
 	}
 
 	// Set session
@@ -55,9 +57,14 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+		return
 	}
 
 	c.JSON(200, gin.H{"message": "Logged in successfully.", "status": 200})
+}
+
+func (uc *UserController) Logout(c *gin.Context) {
+
 }
 
 func (uc *UserController) Register(c *gin.Context) {
@@ -79,6 +86,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.Save")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+		return
 	}
 
 	// Set user ID to last inserted ID
@@ -89,6 +97,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+		return
 	}
 
 	c.JSON(200, gin.H{"message": "Registered successfully.", "status": 200})
