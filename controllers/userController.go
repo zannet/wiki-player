@@ -38,7 +38,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	// Check if user exists and get UserData instance if it does
 	ud, err := uc.UM.Get("email", g.Email)
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
+		tracelog.CompletedError(err, "UserController", "uc.UM.Get")
 		c.JSON(401, gin.H{"message": "Invalid email.", "status": 401})
 		return
 	}

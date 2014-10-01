@@ -37,6 +37,7 @@ func (um UserModel) Get(field, value string) (ud *UserData, err error) {
 	var accessLevel int
 	var joined time.Time
 	var id, email, username, firstName, lastName, hash string
+
 	err = stmt.QueryRow(value).Scan(&id, &email, &username, &firstName, &lastName, &hash, &accessLevel, &joined)
 	if err != nil {
 		return &UserData{}, err
