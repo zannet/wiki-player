@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"time"
 
 	"bitbucket.org/adred/wiki-player/models"
@@ -30,6 +31,11 @@ type (
 	}
 )
 
+func (uc *UserController) CheckSessionStatus(c *gin.Context) {
+	session, _ := uc.Store.Get(c.Request, "session")
+	fmt.Println(session)
+}
+
 func (uc *UserController) Login(c *gin.Context) {
 	var g Login
 	// Bind params
@@ -38,7 +44,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	// Check if user exists and get UserData instance if it does
 	ud, err := uc.UM.Get("email", g.Email)
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.Get")
+		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
 		c.JSON(401, gin.H{"message": "Invalid email.", "status": 401})
 		return
 	}
@@ -53,7 +59,7 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	// Set session
 	uc.UM.UserData = ud
-	err = uc.setSession(c)
+	err = uc.setSession(c, 1)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -64,7 +70,9 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 func (uc *UserController) Logout(c *gin.Context) {
+	uc.setSession(c, 0)
 
+	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
 func (uc *UserController) Register(c *gin.Context) {
@@ -93,7 +101,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	uc.UM.UserData.Id = id
 
 	// Set session
-	err = uc.setSession(c)
+	err = uc.setSession(c, 1)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -103,17 +111,27 @@ func (uc *UserController) Register(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Registered successfully.", "status": 200})
 }
 
-func (uc *UserController) setSession(c *gin.Context) (err error) {
+func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, "session")
 
-	// Set some session values
-	session.Values["uid"] = uc.UM.UserData.Id
-	session.Values["email"] = uc.UM.UserData.Email
-	session.Values["username"] = uc.UM.UserData.Username
-	session.Values["firstName"] = uc.UM.UserData.FirstName
-	session.Values["lastName"] = uc.UM.UserData.LastName
-	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
+	if state == 1 {
+		// Set some session values
+		session.Values["uid"] = uc.UM.UserData.Id
+		session.Values["email"] = uc.UM.UserData.Email
+		session.Values["username"] = uc.UM.UserData.Username
+		session.Values["firstName"] = uc.UM.UserData.FirstName
+		session.Values["lastName"] = uc.UM.UserData.LastName
+		session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
+	} else {
+		// Delete session
+		delete(session.Values, "uid")
+		delete(session.Values, "email")
+		delete(session.Values, "username")
+		delete(session.Values, "firstName")
+		delete(session.Values, "lastName")
+		delete(session.Values, "accessLevel")
+	}
 
 	// Save session
 	err = session.Save(c.Request, c.Writer)
