@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/adred/wiki-player/models"
@@ -108,7 +107,7 @@ func (uc *UserController) Register(c *gin.Context) {
 
 func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	// Store in session variable
-	session, _ := uc.Store.Get(c.Request, "session")
+	session, _ := uc.Store.Get(c.Request, "")
 
 	if state >= 1 {
 		// Set some session values
@@ -128,6 +127,8 @@ func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	if err != nil {
 		return err
 	}
+
+	// fmt.Println(session)
 
 	return nil
 }

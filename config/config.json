@@ -6,5 +6,6 @@
 	"Password": "redeye",
 	"LogDir": "/home/adred/Golang/src/github.com/adred/wiki-player/log",
 	"Salt": "Narred",
-	"SecretKey": "NarredIsAwesome"
+	"SecretKey": "NarredIsAwesome",
+	"SessionName": "narred"
 }

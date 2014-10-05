@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/adred/wiki-player/controllers"
-	// "github.com/adred/wiki-player/middlewares"
+	"github.com/adred/wiki-player/middlewares"
 	"github.com/adred/wiki-player/models"
 	"github.com/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
@@ -32,13 +32,11 @@ func main() {
 
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
-	// cm := &models.ClientModel{DbHandle: dbHandle}
 	// nm := &models.NonceModel{DbHandle: dbHandle}
 	um := &models.UserModel{DbHandle: dbHandle, UserData: &models.UserData{}}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
-	// cc := &controllers.ClientController{CM: cm}
 	// nc := &controllers.NonceController{NM: nm}
 	uc := &controllers.UserController{UM: um, Store: store}
 
@@ -46,12 +44,10 @@ func main() {
 	mux := gin.Default()
 
 	// Middlewares
-	// mux.Use(middlewares.ClientAuth(dbHandle))
-	// mux.Use(middlewares.UserAuth(dbHandle))
+	mux.Use(middlewares.UserAuth(store))
 
 	// Routes
 	mux.GET("/", sc.Index)
-	// mux.POST("/client", cc.Index) // mux.GET("/nonce", nc.Create)
 	mux.POST("/users/login", uc.Login)
 	mux.POST("/users/logout", uc.Logout)
 	mux.POST("/users/register", uc.Register)

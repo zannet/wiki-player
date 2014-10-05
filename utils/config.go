@@ -21,13 +21,15 @@ type (
 	}
 
 	config struct {
-		Host     string
-		Database string
-		Driver   string
-		Username string
-		Password string
-		LogDir   string
-		Salt     string
+		Host        string
+		Database    string
+		Driver      string
+		Username    string
+		Password    string
+		LogDir      string
+		Salt        string
+		SecretKey   string
+		SessionName string
 	}
 )
 
