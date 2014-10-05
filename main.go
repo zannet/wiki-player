@@ -55,7 +55,6 @@ func main() {
 	mux.POST("/users/login", uc.Login)
 	mux.POST("/users/logout", uc.Logout)
 	mux.POST("/users/register", uc.Register)
-	mux.GET("/users/session", uc.CheckSessionStatus)
 
 	// Listen and serve on 0.0.0.0:8080
 	http.ListenAndServe(":8080", context.ClearHandler(mux))

@@ -31,11 +31,6 @@ type (
 	}
 )
 
-func (uc *UserController) CheckSessionStatus(c *gin.Context) {
-	session, _ := uc.Store.Get(c.Request, "session")
-	fmt.Println(session)
-}
-
 func (uc *UserController) Login(c *gin.Context) {
 	var g Login
 	// Bind params
