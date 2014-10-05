@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"bitbucket.org/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/utils"
 )
 
 type (

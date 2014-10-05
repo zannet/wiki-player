@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"bitbucket.org/adred/wiki-player/models"
+	"github.com/adred/wiki-player/models"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 )

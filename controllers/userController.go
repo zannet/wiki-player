@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"bitbucket.org/adred/wiki-player/models"
-	"bitbucket.org/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/models"
+	"github.com/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
@@ -70,7 +70,7 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 func (uc *UserController) Logout(c *gin.Context) {
-	uc.setSession(c, 0)
+	uc.setSession(c, -1)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
@@ -115,7 +115,7 @@ func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, "session")
 
-	if state == 1 {
+	if state >= 1 {
 		// Set some session values
 		session.Values["uid"] = uc.UM.UserData.Id
 		session.Values["email"] = uc.UM.UserData.Email
@@ -125,12 +125,7 @@ func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 		session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
 	} else {
 		// Delete session
-		delete(session.Values, "uid")
-		delete(session.Values, "email")
-		delete(session.Values, "username")
-		delete(session.Values, "firstName")
-		delete(session.Values, "lastName")
-		delete(session.Values, "accessLevel")
+		session.Options.MaxAge = -3600
 	}
 
 	// Save session

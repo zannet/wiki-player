@@ -1,4 +1,4 @@
-cd $GOPATH/src/bitbucket.org/adred/wiki-player
+cd $GOPATH/src/github.com/adred/wiki-player
 go clean -i
 go build
 

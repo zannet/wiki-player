@@ -3,10 +3,10 @@ package main
 import (
 	"net/http"
 
-	"bitbucket.org/adred/wiki-player/controllers"
-	// "bitbucket.org/adred/wiki-player/middlewares"
-	"bitbucket.org/adred/wiki-player/models"
-	"bitbucket.org/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/controllers"
+	// "github.com/adred/wiki-player/middlewares"
+	"github.com/adred/wiki-player/models"
+	"github.com/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/context"

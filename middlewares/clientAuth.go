@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"bitbucket.org/adred/wiki-player/models"
-	"bitbucket.org/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/models"
+	"github.com/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 )
