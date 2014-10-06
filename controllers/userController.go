@@ -107,7 +107,7 @@ func (uc *UserController) Register(c *gin.Context) {
 
 func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	// Store in session variable
-	session, _ := uc.Store.Get(c.Request, "")
+	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))
 
 	if state >= 1 {
 		// Set some session values
