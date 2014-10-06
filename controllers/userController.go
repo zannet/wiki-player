@@ -68,7 +68,7 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	// Set session
 	uc.UM.UserData = ud
-	err = uc.setSession(c, 1)
+	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -80,7 +80,7 @@ func (uc *UserController) Login(c *gin.Context) {
 
 // Logout logs the user out
 func (uc *UserController) Logout(c *gin.Context) {
-	uc.setSession(c, -1)
+	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
@@ -112,7 +112,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	uc.UM.UserData.Id = id
 
 	// Set session
-	err = uc.setSession(c, 1)
+	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -146,22 +146,32 @@ func (uc *UserController) Update(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
-	// Store in session variable
+func (uc *UserController) setSession(c *gin.Context) (err error) {
+	// Create session
 	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))
 
-	if state >= 1 {
-		// Set some session values
-		session.Values["uid"] = uc.UM.UserData.Id
-		session.Values["email"] = uc.UM.UserData.Email
-		session.Values["username"] = uc.UM.UserData.Username
-		session.Values["firstName"] = uc.UM.UserData.FirstName
-		session.Values["lastName"] = uc.UM.UserData.LastName
-		session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
-	} else {
-		// Delete session
-		session.Options.MaxAge = -3600
+	// Set some session values
+	session.Values["uid"] = uc.UM.UserData.Id
+	session.Values["email"] = uc.UM.UserData.Email
+	session.Values["username"] = uc.UM.UserData.Username
+	session.Values["firstName"] = uc.UM.UserData.FirstName
+	session.Values["lastName"] = uc.UM.UserData.LastName
+	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
+
+	// Save session
+	err = session.Save(c.Request, c.Writer)
+	if err != nil {
+		return err
 	}
+
+	return nil
+}
+
+// clearSession destroys the session
+func (uc *UserController) clearSession(c *gin.Context) (err error) {
+	// Get session
+	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))
+	session.Options.MaxAge = -3600
 
 	// Save session
 	err = session.Save(c.Request, c.Writer)
