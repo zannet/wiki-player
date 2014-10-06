@@ -22,7 +22,7 @@ func main() {
 	store := sessions.NewCookieStore([]byte(utils.ConfigEntry("SecretKey")))
 	store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   3600 * 8,
+		MaxAge:   3600,
 		HttpOnly: true,
 	}
 
