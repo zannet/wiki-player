@@ -16,11 +16,13 @@ type (
 		Store *sessions.CookieStore
 	}
 
+	// Login struct is used for login payload binding
 	Login struct {
-		Email    string `json:"email" binding:"required"`
+		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
+	// Register struct is used for register payload binding
 	Register struct {
 		Email     string `json:"email" binding:"required"`
 		Username  string `json:"username" binding:"required"`
@@ -28,19 +30,32 @@ type (
 		FirstName string `json:"first_name" binding:"required"`
 		LastName  string `json:"last_name" binding:"required"`
 	}
+
+	// Update struct is used for update payload binding
+	Update struct {
+		Email     string `json:"email" binding:"required"`
+		Password  string `json:"password" binding:"required"`
+		FirstName string `json:"first_name" binding:"required"`
+		LastName  string `json:"last_name" binding:"required"`
+	}
 )
 
+// Login logs the user in
 func (uc *UserController) Login(c *gin.Context) {
 	var g Login
 	// Bind params
 	c.Bind(&g)
 
 	// Check if user exists and get UserData instance if it does
-	ud, err := uc.UM.Get("email", g.Email)
+	ud, err := uc.UM.Get("email", g.Username)
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
-		c.JSON(401, gin.H{"message": "Invalid email.", "status": 401})
-		return
+		// Mybe the user provided the username instead of email
+		ud, err = uc.UM.Get("username", g.Username)
+		if err != nil {
+			tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
+			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
+			return
+		}
 	}
 
 	// Compare hashes
@@ -63,12 +78,14 @@ func (uc *UserController) Login(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Logged in successfully.", "status": 200})
 }
 
+// Logout logs the user out
 func (uc *UserController) Logout(c *gin.Context) {
 	uc.setSession(c, -1)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
+// Register registers the user
 func (uc *UserController) Register(c *gin.Context) {
 	var r Register
 	// Bind params
@@ -83,8 +100,8 @@ func (uc *UserController) Register(c *gin.Context) {
 	uc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
 	uc.UM.UserData.Joined = time.Now().Local()
 
-	// Save user
-	id, err := uc.UM.Save()
+	// Create user
+	id, err := uc.UM.Create()
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.Save")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
@@ -105,6 +122,30 @@ func (uc *UserController) Register(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Registered successfully.", "status": 200})
 }
 
+// Update udpates the user
+func (uc *UserController) Update(c *gin.Context) {
+	var u Update
+	// Bind params
+	c.Bind(&u)
+
+	// Set user data
+	uc.UM.UserData.Email = u.Email
+	uc.UM.UserData.FirstName = u.FirstName
+	uc.UM.UserData.LastName = u.LastName
+	uc.UM.UserData.Hash = utils.ComputeHmac256(u.Password, utils.ConfigEntry("Salt"))
+
+	// Update user
+	err := uc.UM.Update()
+	if err != nil {
+		tracelog.CompletedError(err, "UserController", "uc.UM.Update")
+		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "User updated successfully.", "status": 200})
+}
+
+// setSession sets the session
 func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 	// Store in session variable
 	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))

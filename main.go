@@ -55,6 +55,7 @@ func main() {
 
 	// Private routes
 	private.GET("/", sc.Index)
+	private.POST("/users/update", uc.Update)
 	private.POST("/users/logout", uc.Logout)
 
 	// Listen and serve on 0.0.0.0:8080

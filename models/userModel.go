@@ -24,7 +24,7 @@ type (
 	}
 )
 
-func (um UserModel) Get(field, value string) (ud *UserData, err error) {
+func (um *UserModel) Get(field, value string) (ud *UserData, err error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -55,7 +55,26 @@ func (um UserModel) Get(field, value string) (ud *UserData, err error) {
 	}, nil
 }
 
-func (um UserModel) Save() (id string, err error) {
+func (um *UserModel) Update() (err error) {
+	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.FirstName, um.UserData.LastName, um.UserData.Hash, um.UserData.Id)
+	if err != nil {
+		return err
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (um *UserModel) Create() (id string, err error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
