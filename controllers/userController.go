@@ -128,7 +128,5 @@ func (uc *UserController) setSession(c *gin.Context, state int) (err error) {
 		return err
 	}
 
-	// fmt.Println(session)
-
 	return nil
 }

@@ -13,15 +13,16 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-// Our main go routine
+// Main go routine
 func main() {
 	// Start logger
 	tracelog.StartFile(1, utils.ConfigEntry("LogDir"), 1)
 
+	// Get new cookie store
 	store := sessions.NewCookieStore([]byte(utils.ConfigEntry("SecretKey")))
 	store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   3600 * 8, // 8 hours
+		MaxAge:   3600 * 8,
 		HttpOnly: true,
 	}
 
@@ -43,14 +44,18 @@ func main() {
 	// Init Gin
 	mux := gin.Default()
 
-	// Middlewares
-	mux.Use(middlewares.UserAuth(store))
+	// Create private routes group
+	private := mux.Group("/")
+	// Append UserAuth middleware
+	private.Use(middlewares.UserAuth(store))
 
-	// Routes
-	mux.GET("/", sc.Index)
+	// Public routes
 	mux.POST("/users/login", uc.Login)
-	mux.POST("/users/logout", uc.Logout)
 	mux.POST("/users/register", uc.Register)
+
+	// Private routes
+	private.GET("/", sc.Index)
+	private.POST("/users/logout", uc.Logout)
 
 	// Listen and serve on 0.0.0.0:8080
 	http.ListenAndServe(":8080", context.ClearHandler(mux))
