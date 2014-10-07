@@ -13,17 +13,16 @@ type (
 	}
 )
 
-func (nm *NonceModel) Create() (string, error) {
+func (nm *NonceModel) Create(uid string) (nonce string, err error) {
 	stmt, err := nm.DbHandle.Prepare("INSERT INTO nonces VALUES ('', ?, ?, ?)")
 	if err != nil {
 		return "", err
 	}
 
-	clientId := 1
-	nonce := utils.RandomString(16)
+	nonce = utils.RandomString(16)
 	created := time.Now().Local()
 
-	_, err = stmt.Exec(clientId, nonce, created)
+	_, err = stmt.Exec(uid, nonce, created)
 	if err != nil {
 		return "", err
 	}
@@ -31,7 +30,7 @@ func (nm *NonceModel) Create() (string, error) {
 	return nonce, nil
 }
 
-func (nm *NonceModel) Verify(nonce string) (bool, error) {
+func (nm *NonceModel) Verify(nonce string) (exists bool, err error) {
 	stmt, err := nm.DbHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
 	if err != nil {
 		return false, err
@@ -45,7 +44,7 @@ func (nm *NonceModel) Verify(nonce string) (bool, error) {
 	return true, nil
 }
 
-func (nm *NonceModel) Delete(id string) error {
+func (nm *NonceModel) Delete(id string) (err error) {
 	stmt, err := nm.DbHandle.Prepare("DELETE FROM nonces WHERE id = ?")
 	if err != nil {
 		return err

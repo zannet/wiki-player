@@ -55,6 +55,8 @@ func main() {
 
 	// Private routes
 	private.GET("/", sc.Index)
+	private.GET("/users/delete/:nonce", uc.ConfirmDelete)
+	private.POST("/users/delete", uc.Delete)
 	private.POST("/users/update", uc.Update)
 	private.POST("/users/logout", uc.Logout)
 

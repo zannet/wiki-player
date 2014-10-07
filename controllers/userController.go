@@ -145,6 +145,33 @@ func (uc *UserController) Update(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "User updated successfully.", "status": 200})
 }
 
+// Delete sends delete confirmation email to the user
+func (uc *UserController) Delete(c *gin.Context) {
+	//
+	// Update user
+	// err := uc.UM.Update()
+	// if err != nil {
+	// 	tracelog.CompletedError(err, "UserController", "uc.UM.Update")
+	// 	c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+	// 	return
+	// }
+
+	// c.JSON(200, gin.H{"message": "User updated successfully.", "status": 200})
+}
+
+// Delete deletes the user
+func (uc *UserController) ConfirmDelete(c *gin.Context) {
+	// Update user
+	err := uc.UM.Delete(c.Params.ByName("nonce"))
+	if err != nil {
+		tracelog.CompletedError(err, "UserController", "uc.UM.Delete")
+		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "User deleted successfully.", "status": 200})
+}
+
 // setSession sets the session
 func (uc *UserController) setSession(c *gin.Context) (err error) {
 	// Create session

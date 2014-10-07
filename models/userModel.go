@@ -93,3 +93,22 @@ func (um *UserModel) Create() (id string, err error) {
 
 	return strconv.FormatInt(lId, 10), nil
 }
+
+func (um *UserModel) Delete(nonce string) (err error) {
+	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec(nonce)
+	if err != nil {
+		return err
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
