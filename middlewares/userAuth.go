@@ -15,7 +15,6 @@ func UserAuth(store *sessions.CookieStore) gin.HandlerFunc {
 		session := c.MustGet("session").(*sessions.Session)
 		if session.Values["uid"] == nil {
 			tracelog.CompletedError(emptySession, "UserAuth", "Checking of session uid value")
-			c.JSON(401, gin.H{"message": "Empty Session.", "status": 401})
 			c.Abort(401)
 		}
 	}
