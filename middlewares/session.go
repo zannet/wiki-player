@@ -13,7 +13,6 @@ func Session(store *sessions.CookieStore) gin.HandlerFunc {
 		session, err := store.Get(c.Request, utils.ConfigEntry("SessionName"))
 		if err != nil {
 			tracelog.CompletedError(emptySession, "Session", "Getting the session")
-			c.JSON(500, gin.H{"message": "Failed to get the session.", "status": 500})
 			c.Abort(500)
 		}
 
