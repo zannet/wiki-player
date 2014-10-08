@@ -161,7 +161,7 @@ func (uc *UserController) Delete(c *gin.Context) {
 
 // Delete deletes the user
 func (uc *UserController) ConfirmDelete(c *gin.Context) {
-	// Update user
+	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
 	if err != nil {
 		tracelog.CompletedError(err, "UserController", "uc.UM.Delete")
@@ -174,8 +174,8 @@ func (uc *UserController) ConfirmDelete(c *gin.Context) {
 
 // setSession sets the session
 func (uc *UserController) setSession(c *gin.Context) (err error) {
-	// Create session
-	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))
+	// Get session
+	session := c.MustGet("session").(*sessions.Session)
 
 	// Set some session values
 	session.Values["uid"] = uc.UM.UserData.Id
@@ -197,7 +197,7 @@ func (uc *UserController) setSession(c *gin.Context) (err error) {
 // clearSession destroys the session
 func (uc *UserController) clearSession(c *gin.Context) (err error) {
 	// Get session
-	session, _ := uc.Store.Get(c.Request, utils.ConfigEntry("SessionName"))
+	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600
 
 	// Save session

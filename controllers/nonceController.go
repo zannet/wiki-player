@@ -11,7 +11,7 @@ type NonceController struct {
 }
 
 func (nc *NonceController) Create(c *gin.Context) {
-	nonce, err := nc.NM.Create()
+	nonce, err := nc.NM.Create("2")
 	if err != nil {
 		tracelog.CompletedError(err, "NonceController", "Create")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})

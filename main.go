@@ -1,15 +1,12 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/adred/wiki-player/controllers"
 	"github.com/adred/wiki-player/middlewares"
 	"github.com/adred/wiki-player/models"
 	"github.com/adred/wiki-player/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
-	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 )
 
@@ -43,11 +40,14 @@ func main() {
 
 	// Init Gin
 	mux := gin.Default()
-
 	// Create private routes group
 	private := mux.Group("/")
-	// Append UserAuth middleware
-	private.Use(middlewares.UserAuth(store))
+
+	// Public middlewares
+	mux.Use(middlewares.Session(store))
+
+	// Private middlewares
+	private.Use(middlewares.Session(store), middlewares.UserAuth(store))
 
 	// Public routes
 	mux.POST("/users/login", uc.Login)
@@ -61,7 +61,7 @@ func main() {
 	private.POST("/users/logout", uc.Logout)
 
 	// Listen and serve on 0.0.0.0:8080
-	http.ListenAndServe(":8080", context.ClearHandler(mux))
+	mux.Run(":8080")
 
 	tracelog.Stop()
 }
