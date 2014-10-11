@@ -10,8 +10,7 @@ type StaticController struct {
 }
 
 func (sc *StaticController) Index(c *gin.Context) {
-	obj := gin.H{"title": "Main website"}
-	c.HTML(200, "index.html", obj)
+	c.HTML(200, "index.html", nil)
 }
 
 func (sc *StaticController) About(c *gin.Context) {

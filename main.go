@@ -1,9 +1,6 @@
 package main
 
 import (
-	// "fmt"
-	// "html/template"
-
 	"github.com/adred/wiki-player/controllers"
 	"github.com/adred/wiki-player/middlewares"
 	"github.com/adred/wiki-player/models"
@@ -15,6 +12,9 @@ import (
 
 // Main go routine
 func main() {
+	// Temporarily set mode to "test" so we can use custom templates dir
+	gin.SetMode("test")
+
 	// Start logger
 	tracelog.StartFile(1, utils.ConfigEntry("LogDir"), 1)
 
@@ -44,8 +44,9 @@ func main() {
 
 	// Init Gin
 	mux := gin.Default()
+
 	// Load templates
-	mux.LoadHTMLFiles("static/*")
+	mux.LoadHTMLFiles("static/index.html")
 
 	// Routes for static pages
 	static := mux.Group("/")
