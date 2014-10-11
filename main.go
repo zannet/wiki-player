@@ -40,7 +40,7 @@ func main() {
 	sc := &controllers.SongController{SM: sm}
 	// nc := &controllers.NonceController{NM: nm}
 	uc := &controllers.UserController{UM: um, Store: store}
-	s := &controllers.StaticController{Store: store}
+	sp := &controllers.StaticController{Store: store}
 
 	// Init Gin
 	mux := gin.Default()
@@ -50,12 +50,11 @@ func main() {
 	// Routes for static pages
 	static := mux.Group("/")
 	{
-		// Routes for static pages
-		static.GET("/", s.Index)
-		static.GET("/about", s.About)
-		static.GET("/tos", s.Tos)
-		static.GET("/privacy-policy", s.PrivacyPolicy)
-		static.GET("/credits", s.Credits)
+		static.GET("/", sp.Index)
+		static.GET("/about", sp.About)
+		static.GET("/tos", sp.Tos)
+		static.GET("/privacy-policy", sp.PrivacyPolicy)
+		static.GET("/credits", sp.Credits)
 	}
 
 	// Routes that don't authorization
