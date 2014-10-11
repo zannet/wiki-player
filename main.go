@@ -1,6 +1,9 @@
 package main
 
 import (
+	// "fmt"
+	// "html/template"
+
 	"github.com/adred/wiki-player/controllers"
 	"github.com/adred/wiki-player/middlewares"
 	"github.com/adred/wiki-player/models"
@@ -37,28 +40,45 @@ func main() {
 	sc := &controllers.SongController{SM: sm}
 	// nc := &controllers.NonceController{NM: nm}
 	uc := &controllers.UserController{UM: um, Store: store}
+	s := &controllers.StaticController{Store: store}
 
 	// Init Gin
 	mux := gin.Default()
-	// Create private routes group
-	private := mux.Group("/")
+	// Load templates
+	mux.LoadHTMLFiles("static/*")
 
-	// Public middlewares
-	mux.Use(middlewares.Session(store))
+	// Routes for static pages
+	static := mux.Group("/")
+	{
+		// Routes for static pages
+		static.GET("/", s.Index)
+		static.GET("/about", s.About)
+		static.GET("/tos", s.Tos)
+		static.GET("/privacy-policy", s.PrivacyPolicy)
+		static.GET("/credits", s.Credits)
+	}
 
-	// Private middlewares
-	private.Use(middlewares.Session(store), middlewares.UserAuth(store))
+	// Routes that don't authorization
+	basic := mux.Group("/api/v1")
+	basic.Use(middlewares.Session(store))
+	{
+		basic.POST("/users/login", uc.Login)
+		basic.POST("/users/register", uc.Register)
+	}
 
-	// Public routes
-	mux.POST("/users/login", uc.Login)
-	mux.POST("/users/register", uc.Register)
+	// Routes that need authorization
+	auth := mux.Group("/api/v1")
+	auth.Use(middlewares.Session(store), middlewares.UserAuth(store))
+	{
+		auth.GET("/songs", sc.Index)
+		auth.GET("/users/delete/:nonce", uc.ConfirmDelete)
+		auth.POST("/users/delete", uc.Delete)
+		auth.POST("/users/update", uc.Update)
+		auth.POST("/users/logout", uc.Logout)
+	}
 
-	// Private routes
-	private.GET("/", sc.Index)
-	private.GET("/users/delete/:nonce", uc.ConfirmDelete)
-	private.POST("/users/delete", uc.Delete)
-	private.POST("/users/update", uc.Update)
-	private.POST("/users/logout", uc.Logout)
+	// nonce := mux.Group("/api/v1")
+	// nonce.Use(middlewares.Nonce(nm))
 
 	// Listen and serve on 0.0.0.0:8080
 	mux.Run(":8080")

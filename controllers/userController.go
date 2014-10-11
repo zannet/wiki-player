@@ -147,16 +147,7 @@ func (uc *UserController) Update(c *gin.Context) {
 
 // Delete sends delete confirmation email to the user
 func (uc *UserController) Delete(c *gin.Context) {
-	//
-	// Update user
-	// err := uc.UM.Update()
-	// if err != nil {
-	// 	tracelog.CompletedError(err, "UserController", "uc.UM.Update")
-	// 	c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
-	// 	return
-	// }
-
-	// c.JSON(200, gin.H{"message": "User updated successfully.", "status": 200})
+	// Send email confirmaation here
 }
 
 // Delete deletes the user

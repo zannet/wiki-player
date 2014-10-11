@@ -17,5 +17,7 @@ func UserAuth(store *sessions.CookieStore) gin.HandlerFunc {
 			tracelog.CompletedError(emptySession, "UserAuth", "Checking of session uid value")
 			c.Abort(401)
 		}
+
+		c.Next()
 	}
 }
