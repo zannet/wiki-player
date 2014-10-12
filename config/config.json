@@ -7,5 +7,6 @@
 	"LogDir": "/home/adred/Golang/src/github.com/adred/wiki-player/log",
 	"Salt": "Narred",
 	"SecretKey": "NarredIsAwesome",
-	"SessionName": "narred"
+	"SessionName": "narred",
+	"StaticDir": "/home/adred/Golang/src/github.com/adred/wiki-player/static"
 }

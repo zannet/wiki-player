@@ -47,8 +47,10 @@ func main() {
 
 	// Load templates
 	mux.LoadHTMLFiles("static/index.html")
+	// Serve static files
+	mux.Static("/static", utils.ConfigEntry("StaticDir"))
 
-	// Routes for static pages
+	// Routes for static files
 	static := mux.Group("/")
 	{
 		static.GET("/", sp.Index)
