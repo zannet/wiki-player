@@ -50,7 +50,7 @@ func main() {
 	// Serve static files
 	mux.Static("/static", utils.ConfigEntry("StaticDir"))
 
-	// Routes for static files
+	// Routes for static pages
 	static := mux.Group("/")
 	{
 		static.GET("/", sp.Index)
