@@ -64,6 +64,7 @@ func main() {
 	basic := mux.Group("/api/v1")
 	basic.Use(middlewares.Session(store))
 	{
+		basic.GET("/nonce", nc.Create)
 		basic.POST("/users/login", uc.Login)
 		basic.POST("/users/register", uc.Register)
 	}
@@ -73,7 +74,6 @@ func main() {
 	auth.Use(middlewares.Session(store), middlewares.UserAuth(store), middlewares.Nonce(nm))
 	{
 		auth.GET("/songs", sc.Index)
-		auth.GET("/nonce", nc.Create)
 		auth.GET("/users/delete/:nonce", uc.ConfirmDelete)
 		auth.POST("/users/delete", uc.Delete)
 		auth.POST("/users/update", uc.Update)

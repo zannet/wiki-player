@@ -8,11 +8,12 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// Session attaches session to gin context
 func Session(store *sessions.CookieStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, err := store.Get(c.Request, utils.ConfigEntry("SessionName"))
 		if err != nil {
-			tracelog.CompletedError(emptySession, "Session", "Getting the session")
+			tracelog.CompletedError(err, "Session", "Getting the session")
 			c.Abort(500)
 		}
 

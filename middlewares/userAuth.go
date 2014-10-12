@@ -8,16 +8,15 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-var emptySession = errors.New("Empty session.")
+var errSession = errors.New("Empty session.")
 
+// UserAuth checks if a session exists
 func UserAuth(store *sessions.CookieStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := c.MustGet("session").(*sessions.Session)
 		if session.Values["uid"] == nil {
-			tracelog.CompletedError(emptySession, "UserAuth", "Checking of session uid value")
+			tracelog.CompletedError(errSession, "UserAuth", "Checking of session uid value")
 			c.Abort(401)
 		}
-
-		c.Next()
 	}
 }

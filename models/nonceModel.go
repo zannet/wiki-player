@@ -33,18 +33,19 @@ func (nm *NonceModel) Create(uid string) (string, error) {
 }
 
 // Verify verifies the existence of a nonce
-func (nm *NonceModel) Verify(nonce string) (bool, error) {
+func (nm *NonceModel) Verify(nonce string) (string, error) {
 	stmt, err := nm.DbHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
-	_, err = stmt.Query(nonce)
+	var id string
+	err = stmt.QueryRow(nonce).Scan(&id)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
-	return true, nil
+	return id, nil
 }
 
 // Delete deletes a nonce
