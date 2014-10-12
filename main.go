@@ -60,7 +60,7 @@ func main() {
 		static.GET("/credits", sp.Credits)
 	}
 
-	// Routes that don't authorization
+	// Routes that don't need authorization
 	basic := mux.Group("/api/v1")
 	basic.Use(middlewares.Session(store))
 	{
