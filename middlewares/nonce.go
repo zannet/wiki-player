@@ -8,7 +8,7 @@ import (
 
 type (
 	N struct {
-		Nonce string `json:"none" binding:"required"`
+		Nonce string `json:"nonce" binding:"required"`
 	}
 )
 
