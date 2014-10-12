@@ -33,12 +33,12 @@ func main() {
 
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
-	// nm := &models.NonceModel{DbHandle: dbHandle}
+	nm := &models.NonceModel{DbHandle: dbHandle}
 	um := &models.UserModel{DbHandle: dbHandle, UserData: &models.UserData{}}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
-	// nc := &controllers.NonceController{NM: nm}
+	nc := &controllers.NonceController{NM: nm}
 	uc := &controllers.UserController{UM: um, Store: store}
 	vc := &controllers.ViewController{Store: store}
 
@@ -70,17 +70,15 @@ func main() {
 
 	// Routes that need authorization
 	auth := mux.Group("/api/v1")
-	auth.Use(middlewares.Session(store), middlewares.UserAuth(store))
+	auth.Use(middlewares.Session(store), middlewares.UserAuth(store), middlewares.Nonce(nm))
 	{
 		auth.GET("/songs", sc.Index)
+		auth.GET("/nonce", nc.Create)
 		auth.GET("/users/delete/:nonce", uc.ConfirmDelete)
 		auth.POST("/users/delete", uc.Delete)
 		auth.POST("/users/update", uc.Update)
 		auth.POST("/users/logout", uc.Logout)
 	}
-
-	// nonce := mux.Group("/api/v1")
-	// nonce.Use(middlewares.Nonce(nm))
 
 	// Listen and serve on 0.0.0.0:8080
 	mux.Run(":8080")
