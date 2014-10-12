@@ -7,11 +7,12 @@ import (
 )
 
 type (
+	// UserModel is type of this class
 	UserModel struct {
 		DbHandle *sql.DB
 		UserData *UserData
 	}
-
+	// UserData defines the fields of the users table
 	UserData struct {
 		Id          string
 		Email       string
@@ -24,7 +25,8 @@ type (
 	}
 )
 
-func (um *UserModel) Get(field, value string) (ud *UserData, err error) {
+// Get returns UserData instance
+func (um *UserModel) Get(field, value string) (*UserData, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -55,7 +57,8 @@ func (um *UserModel) Get(field, value string) (ud *UserData, err error) {
 	}, nil
 }
 
-func (um *UserModel) Update() (err error) {
+// Update updates the user
+func (um *UserModel) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -74,7 +77,8 @@ func (um *UserModel) Update() (err error) {
 	return nil
 }
 
-func (um *UserModel) Create() (id string, err error) {
+// Create creates a user
+func (um *UserModel) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
@@ -94,7 +98,8 @@ func (um *UserModel) Create() (id string, err error) {
 	return strconv.FormatInt(lId, 10), nil
 }
 
-func (um *UserModel) Delete(nonce string) (err error) {
+// Delete deletes a user
+func (um *UserModel) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err

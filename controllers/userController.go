@@ -11,6 +11,7 @@ import (
 )
 
 type (
+	// UserController is the type of this class
 	UserController struct {
 		UM    *models.UserModel
 		Store *sessions.CookieStore
@@ -150,7 +151,7 @@ func (uc *UserController) Delete(c *gin.Context) {
 	// Send email confirmaation here
 }
 
-// Delete deletes the user
+// ConfirmDelete deletes the user
 func (uc *UserController) ConfirmDelete(c *gin.Context) {
 	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
@@ -164,7 +165,7 @@ func (uc *UserController) ConfirmDelete(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *UserController) setSession(c *gin.Context) (err error) {
+func (uc *UserController) setSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
@@ -177,7 +178,7 @@ func (uc *UserController) setSession(c *gin.Context) (err error) {
 	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
 
 	// Save session
-	err = session.Save(c.Request, c.Writer)
+	err := session.Save(c.Request, c.Writer)
 	if err != nil {
 		return err
 	}
@@ -186,13 +187,13 @@ func (uc *UserController) setSession(c *gin.Context) (err error) {
 }
 
 // clearSession destroys the session
-func (uc *UserController) clearSession(c *gin.Context) (err error) {
+func (uc *UserController) clearSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600
 
 	// Save session
-	err = session.Save(c.Request, c.Writer)
+	err := session.Save(c.Request, c.Writer)
 	if err != nil {
 		return err
 	}

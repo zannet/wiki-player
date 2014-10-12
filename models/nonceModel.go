@@ -8,18 +8,20 @@ import (
 )
 
 type (
+	// NonceModel is the type of this class
 	NonceModel struct {
 		DbHandle *sql.DB
 	}
 )
 
-func (nm *NonceModel) Create(uid string) (nonce string, err error) {
+// Create creates a nonce
+func (nm *NonceModel) Create(uid string) (string, error) {
 	stmt, err := nm.DbHandle.Prepare("INSERT INTO nonces VALUES ('', ?, ?, ?)")
 	if err != nil {
 		return "", err
 	}
 
-	nonce = utils.RandomString(16)
+	nonce := utils.RandomString(16)
 	created := time.Now().Local()
 
 	_, err = stmt.Exec(uid, nonce, created)
@@ -30,7 +32,8 @@ func (nm *NonceModel) Create(uid string) (nonce string, err error) {
 	return nonce, nil
 }
 
-func (nm *NonceModel) Verify(nonce string) (exists bool, err error) {
+// Verify verifies the existence of a nonce
+func (nm *NonceModel) Verify(nonce string) (bool, error) {
 	stmt, err := nm.DbHandle.Prepare("SELECT id FROM nonces WHERE nonce = ?")
 	if err != nil {
 		return false, err
@@ -44,7 +47,8 @@ func (nm *NonceModel) Verify(nonce string) (exists bool, err error) {
 	return true, nil
 }
 
-func (nm *NonceModel) Delete(id string) (err error) {
+// Delete deletes a nonce
+func (nm *NonceModel) Delete(id string) error {
 	stmt, err := nm.DbHandle.Prepare("DELETE FROM nonces WHERE id = ?")
 	if err != nil {
 		return err
