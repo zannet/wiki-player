@@ -30,6 +30,7 @@ type (
 		Salt        string
 		SecretKey   string
 		SessionName string
+		StaticDir   string
 	}
 )
 
