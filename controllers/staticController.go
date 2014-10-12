@@ -5,22 +5,22 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-type StaticController struct {
+type ViewController struct {
 	Store *sessions.CookieStore
 }
 
-func (sc *StaticController) Index(c *gin.Context) {
+func (vc *ViewController) Index(c *gin.Context) {
 	c.HTML(200, "index.html", nil)
 }
 
-func (sc *StaticController) About(c *gin.Context) {
+func (vc *ViewController) About(c *gin.Context) {
 }
 
-func (sc *StaticController) Tos(c *gin.Context) {
+func (vc *ViewController) Tos(c *gin.Context) {
 }
 
-func (sc *StaticController) PrivacyPolicy(c *gin.Context) {
+func (vc *ViewController) PrivacyPolicy(c *gin.Context) {
 }
 
-func (sc *StaticController) Credits(c *gin.Context) {
+func (vc *ViewController) Credits(c *gin.Context) {
 }
