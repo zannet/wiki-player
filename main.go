@@ -46,7 +46,7 @@ func main() {
 	mux := gin.Default()
 
 	// Load templates
-	mux.LoadHTMLFiles("static/index.html")
+	mux.LoadHTMLFiles("views/index.html")
 	// Serve static files
 	mux.Static("/static", utils.ConfigEntry("StaticDir"))
 
