@@ -36,6 +36,7 @@ type (
 
 var ci configSingleton
 
+// MustLoadConfig loads the configs and assign it to configMap
 func MustLoadConfig() {
 	ci.once.Do(func() {
 		// Find the location of the config.json file
@@ -70,6 +71,7 @@ func MustLoadConfig() {
 	})
 }
 
+// ConfigEntry returns a config value
 func ConfigEntry(key string) string {
 	MustLoadConfig()
 	return ci.value.ConfigMap[key]

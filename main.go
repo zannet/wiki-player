@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/adred/wiki-player/controllers"
-	"github.com/adred/wiki-player/middlewares"
-	"github.com/adred/wiki-player/models"
-	"github.com/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/app/controllers"
+	"github.com/adred/wiki-player/app/middlewares"
+	"github.com/adred/wiki-player/app/models"
+	"github.com/adred/wiki-player/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
@@ -46,9 +46,9 @@ func main() {
 	mux := gin.Default()
 
 	// Load templates
-	utils.LoadHTMLFiles("views", mux)
+	utils.LoadHTMLFiles("app/views", mux)
 	// Serve static files
-	mux.Static("/static", utils.ConfigEntry("StaticDir"))
+	mux.Static("/public", utils.ConfigEntry("StaticDir"))
 
 	// Routes for static pages
 	static := mux.Group("/")

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/adred/wiki-player/utils"
+	"github.com/adred/wiki-player/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/context"

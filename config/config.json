@@ -8,5 +8,5 @@
 	"Salt": "Narred",
 	"SecretKey": "NarredIsAwesome",
 	"SessionName": "narred",
-	"StaticDir": "/home/adred/Golang/src/github.com/adred/wiki-player/static"
+	"StaticDir": "/home/adred/Golang/src/github.com/adred/wiki-player/public"
 }

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"sync"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // Automatically load mysql driver
 	"github.com/goinggo/tracelog"
 )
 
@@ -17,6 +17,7 @@ type (
 
 var handle dbSingleton
 
+// MustLoadDB loads the database
 func MustLoadDB() {
 	handle.once.Do(func() {
 		conn, err := sql.Open(ConfigEntry("Driver"),
@@ -35,6 +36,7 @@ func MustLoadDB() {
 	})
 }
 
+// DbHandle retuns a handle of the database connection
 func DbHandle() *sql.DB {
 	MustLoadDB()
 	return handle.value
