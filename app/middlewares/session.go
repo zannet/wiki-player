@@ -19,7 +19,5 @@ func Session(store *sessions.CookieStore) gin.HandlerFunc {
 
 		c.Set("session", session)
 		defer context.Clear(c.Request)
-
-		c.Next()
 	}
 }

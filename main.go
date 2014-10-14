@@ -81,7 +81,7 @@ func main() {
 	}
 
 	// Listen and serve on 0.0.0.0:8080
-	mux.Run(":8080")
+	mux.Run(":9000")
 
 	tracelog.Stop()
 }
