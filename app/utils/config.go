@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"reflect"
 	"sync"
 
@@ -38,10 +39,11 @@ var ci configSingleton
 // MustLoadConfig loads the configs and assign it to configMap
 func MustLoadConfig() {
 	ci.once.Do(func() {
+		// Find the location of the config.json file
+		configFilePath, err := filepath.Abs("config/config.json")
+
 		// Open the config.json file
-		// Note: filepath.Abs() doesn't work for some reason when the app is ran
-		// from tests so I'm just hardcoding the abs path of config.json
-		file, err := os.Open("/home/adred/Golang/src/github.com/adred/wiki-player/config/config.json")
+		file, err := os.Open(configFilePath)
 		if err != nil {
 			tracelog.CompletedError(err, "MustLoadConfig", "os.Open")
 			panic(err.Error())
