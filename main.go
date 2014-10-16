@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/adred/wiki-player/app/controllers"
 	"github.com/adred/wiki-player/app/middlewares"
 	"github.com/adred/wiki-player/app/models"
@@ -46,7 +49,21 @@ func main() {
 	mux := gin.Default()
 
 	// Load templates
-	utils.LoadHTMLFiles("app/views", mux)
+	go func() {
+		err := filepath.Walk("app/views", func(path string, info os.FileInfo, e error) error {
+			if info.IsDir() {
+				return nil
+			}
+			// Load html file
+			mux.LoadHTMLFiles(path)
+			return e
+		})
+		if err != nil {
+			tracelog.CompletedError(err, "LoadHTMLFiles", "filepath.Walk")
+			panic(err.Error())
+		}
+	}()
+
 	// Serve static files
 	mux.Static("/public", utils.ConfigEntry("StaticDir"))
 
