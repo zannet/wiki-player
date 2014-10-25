@@ -49,7 +49,7 @@ var toString = Object.prototype.toString,
 Handlebars.registerHelper = function(name, fn, inverse) {
   if (toString.call(name) === objectType) {
     if (inverse || fn) { throw new Handlebars.Exception('Arg not supported with multiple helpers'); }
-    Handlebars.Utils.extend(this.helpers, name);
+    Handlebars.lib.extend(this.helpers, name);
   } else {
     if (inverse) { fn.not = inverse; }
     this.helpers[name] = fn;
@@ -58,7 +58,7 @@ Handlebars.registerHelper = function(name, fn, inverse) {
 
 Handlebars.registerPartial = function(name, str) {
   if (toString.call(name) === objectType) {
-    Handlebars.Utils.extend(this.partials,  name);
+    Handlebars.lib.extend(this.partials,  name);
   } else {
     this.partials[name] = str;
   }
@@ -160,7 +160,7 @@ Handlebars.registerHelper('if', function(conditional, options) {
   var type = toString.call(conditional);
   if(type === functionType) { conditional = conditional.call(this); }
 
-  if(!conditional || Handlebars.Utils.isEmpty(conditional)) {
+  if(!conditional || Handlebars.lib.isEmpty(conditional)) {
     return options.inverse(this);
   } else {
     return options.fn(this);
@@ -175,7 +175,7 @@ Handlebars.registerHelper('with', function(context, options) {
   var type = toString.call(context);
   if(type === functionType) { context = context.call(this); }
 
-  if (!Handlebars.Utils.isEmpty(context)) return options.fn(context);
+  if (!Handlebars.lib.isEmpty(context)) return options.fn(context);
 });
 
 Handlebars.registerHelper('log', function(context, options) {
@@ -807,7 +807,7 @@ Handlebars.AST.CommentNode = function(comment) {
   this.comment = comment;
 };
 ;
-// lib/handlebars/utils.js
+// lib/handlebars/lib.js
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
 
@@ -845,7 +845,7 @@ var escapeChar = function(chr) {
   return escape[chr] || "&amp;";
 };
 
-Handlebars.Utils = {
+Handlebars.lib = {
   extend: function(obj, value) {
     for(var key in value) {
       if(value.hasOwnProperty(key)) {
@@ -2180,7 +2180,7 @@ Handlebars.VM = {
   template: function(templateSpec) {
     // Just add water
     var container = {
-      escapeExpression: Handlebars.Utils.escapeExpression,
+      escapeExpression: Handlebars.lib.escapeExpression,
       invokePartial: Handlebars.VM.invokePartial,
       programs: [],
       program: function(i, fn, data) {
@@ -2197,8 +2197,8 @@ Handlebars.VM = {
 
         if (param && common) {
           ret = {};
-          Handlebars.Utils.extend(ret, common);
-          Handlebars.Utils.extend(ret, param);
+          Handlebars.lib.extend(ret, common);
+          Handlebars.lib.extend(ret, param);
         }
         return ret;
       },

@@ -1715,7 +1715,7 @@ DS.AdapterPopulatedRecordArray = DS.RecordArray.extend({
 */
 
 var get = Ember.get, set = Ember.set;
-var map = Ember.EnumerableUtils.map;
+var map = Ember.Enumerablelib.map;
 
 /**
   A `ManyArray` is a `RecordArray` that represents the contents of a has-many
@@ -1963,9 +1963,9 @@ DS.ManyArray = DS.RecordArray.extend({
 var get = Ember.get, set = Ember.set;
 var once = Ember.run.once;
 var isNone = Ember.isNone;
-var forEach = Ember.EnumerableUtils.forEach;
-var indexOf = Ember.EnumerableUtils.indexOf;
-var map = Ember.EnumerableUtils.map;
+var forEach = Ember.Enumerablelib.forEach;
+var indexOf = Ember.Enumerablelib.indexOf;
+var map = Ember.Enumerablelib.map;
 var resolve = Ember.RSVP.resolve;
 var copy = Ember.copy;
 
@@ -5948,7 +5948,7 @@ AttributeChange.prototype = {
 */
 
 var get = Ember.get, set = Ember.set;
-var forEach = Ember.EnumerableUtils.forEach;
+var forEach = Ember.Enumerablelib.forEach;
 
 /**
   @class RelationshipChange
@@ -7222,7 +7222,7 @@ DS.Model.reopen({
 */
 
 var get = Ember.get, set = Ember.set;
-var forEach = Ember.EnumerableUtils.forEach;
+var forEach = Ember.Enumerablelib.forEach;
 
 /**
   @class RecordArrayManager
@@ -7921,7 +7921,7 @@ DS.Adapter = Ember.Object.extend({
 */
 
 var get = Ember.get, fmt = Ember.String.fmt,
-    indexOf = Ember.EnumerableUtils.indexOf;
+    indexOf = Ember.Enumerablelib.indexOf;
 
 var counter = 0;
 
@@ -10127,7 +10127,7 @@ Ember.Inflector.inflector = new Ember.Inflector(Ember.Inflector.defaultRules);
 */
 
 var get = Ember.get,
-    forEach = Ember.EnumerableUtils.forEach,
+    forEach = Ember.Enumerablelib.forEach,
     camelize =   Ember.String.camelize,
     capitalize = Ember.String.capitalize,
     decamelize = Ember.String.decamelize,
@@ -10337,7 +10337,7 @@ DS.ActiveModelSerializer = DS.RESTSerializer.extend({
 
 (function() {
 var get = Ember.get;
-var forEach = Ember.EnumerableUtils.forEach;
+var forEach = Ember.Enumerablelib.forEach;
 
 /**
   The EmbeddedRecordsMixin allows you to add embedded record support to your
@@ -10467,7 +10467,7 @@ function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
   @module ember-data
 */
 
-var forEach = Ember.EnumerableUtils.forEach;
+var forEach = Ember.Enumerablelib.forEach;
 var decamelize = Ember.String.decamelize,
     underscore = Ember.String.underscore,
     pluralize  = Ember.String.pluralize;
