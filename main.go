@@ -1,9 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/adred/wiki-player/app/controllers"
 	"github.com/adred/wiki-player/app/middlewares"
 	"github.com/adred/wiki-player/app/models"
@@ -15,9 +12,6 @@ import (
 
 // Main go routine
 func main() {
-	// Temporarily set mode to "test" so we can use custom templates dir
-	gin.SetMode("test")
-
 	// Start logger
 	tracelog.StartFile(1, utils.ConfigEntry("LogDir"), 1)
 
@@ -49,20 +43,7 @@ func main() {
 	mux := gin.Default()
 
 	// Load templates
-	go func() {
-		err := filepath.Walk("app/views", func(path string, info os.FileInfo, e error) error {
-			if info.IsDir() {
-				return nil
-			}
-			// Load html file
-			mux.LoadHTMLFiles(path)
-			return e
-		})
-		if err != nil {
-			tracelog.CompletedError(err, "LoadHTMLFiles", "filepath.Walk")
-			panic(err.Error())
-		}
-	}()
+	mux.LoadHTMLGlob("app/views/*")
 
 	// Serve static files
 	mux.Static("/public", utils.ConfigEntry("StaticDir"))

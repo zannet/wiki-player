@@ -14,7 +14,8 @@ func Session(store *sessions.CookieStore) gin.HandlerFunc {
 		session, err := store.Get(c.Request, utils.ConfigEntry("SessionName"))
 		if err != nil {
 			tracelog.CompletedError(err, "Session", "Getting the session")
-			c.Abort(500)
+			c.Error(err, "Failed to create session")
+			c.AbortWithStatus(500)
 		}
 
 		c.Set("session", session)

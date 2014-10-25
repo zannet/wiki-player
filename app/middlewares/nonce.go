@@ -32,7 +32,8 @@ func Nonce(nm *models.NonceModel) gin.HandlerFunc {
 				id, err = nm.Verify(val[0])
 			} else {
 				tracelog.CompletedError(errNonce, "Nonce", "Empty or no nonce sent")
-				c.Abort(401)
+				c.Error(errNonce, "Empty or no nonce sent")
+				c.AbortWithStatus(401)
 			}
 		} else {
 			id, err = nm.Verify(n.Nonce)
@@ -40,14 +41,16 @@ func Nonce(nm *models.NonceModel) gin.HandlerFunc {
 
 		if err != nil {
 			tracelog.CompletedError(err, "Nonce", "nm.Verify")
-			c.Abort(401)
+			c.Error(err, "Invalid nonce sent")
+			c.AbortWithStatus(401)
 		}
 
 		// Delete nonce once verified
 		err = nm.Delete(id)
 		if err != nil {
 			tracelog.CompletedError(err, "Nonce", "nm.Delete")
-			c.Abort(401)
+			c.Error(err, "Something went wrong")
+			c.AbortWithStatus(500)
 		}
 	}
 }
