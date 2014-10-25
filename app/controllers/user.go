@@ -11,9 +11,9 @@ import (
 )
 
 type (
-	// UserController is the type of this class
-	UserController struct {
-		UM    *models.UserModel
+	// User is the type of this class
+	User struct {
+		UM    *models.User
 		Store *sessions.CookieStore
 	}
 
@@ -42,7 +42,7 @@ type (
 )
 
 // Login logs the user in
-func (uc *UserController) Login(c *gin.Context) {
+func (uc *User) Login(c *gin.Context) {
 	var g Login
 	// Bind params
 	c.Bind(&g)
@@ -53,7 +53,7 @@ func (uc *UserController) Login(c *gin.Context) {
 		// Mybe the user provided the username instead of email
 		ud, err = uc.UM.Get("username", g.Username)
 		if err != nil {
-			tracelog.CompletedError(err, "UserController", "uc.UM.NewUserModel")
+			tracelog.CompletedError(err, "User", "uc.UM.NewUserModel")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
 			return
 		}
@@ -62,7 +62,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	// Compare hashes
 	hash := utils.ComputeHmac256(g.Password, utils.ConfigEntry("Salt"))
 	if hash != ud.Hash {
-		tracelog.CompletedError(err, "UserController", "Hashes comparison")
+		tracelog.CompletedError(err, "User", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
 	}
@@ -71,7 +71,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	uc.UM.UserData = ud
 	err = uc.setSession(c)
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.setSession")
+		tracelog.CompletedError(err, "User", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -80,14 +80,14 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 // Logout logs the user out
-func (uc *UserController) Logout(c *gin.Context) {
+func (uc *User) Logout(c *gin.Context) {
 	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
 // Register registers the user
-func (uc *UserController) Register(c *gin.Context) {
+func (uc *User) Register(c *gin.Context) {
 	var r Register
 	// Bind params
 	c.Bind(&r)
@@ -104,7 +104,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	// Create user
 	id, err := uc.UM.Create()
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.Save")
+		tracelog.CompletedError(err, "User", "uc.UM.Save")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -115,7 +115,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	// Set session
 	err = uc.setSession(c)
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.setSession")
+		tracelog.CompletedError(err, "User", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -124,7 +124,7 @@ func (uc *UserController) Register(c *gin.Context) {
 }
 
 // Update udpates the user
-func (uc *UserController) Update(c *gin.Context) {
+func (uc *User) Update(c *gin.Context) {
 	var u Update
 	// Bind params
 	c.Bind(&u)
@@ -138,7 +138,7 @@ func (uc *UserController) Update(c *gin.Context) {
 	// Update user
 	err := uc.UM.Update()
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.Update")
+		tracelog.CompletedError(err, "User", "uc.UM.Update")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -147,16 +147,16 @@ func (uc *UserController) Update(c *gin.Context) {
 }
 
 // Delete sends delete confirmation email to the user
-func (uc *UserController) Delete(c *gin.Context) {
+func (uc *User) Delete(c *gin.Context) {
 	// Send email confirmaation here
 }
 
 // ConfirmDelete deletes the user
-func (uc *UserController) ConfirmDelete(c *gin.Context) {
+func (uc *User) ConfirmDelete(c *gin.Context) {
 	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
 	if err != nil {
-		tracelog.CompletedError(err, "UserController", "uc.UM.Delete")
+		tracelog.CompletedError(err, "User", "uc.UM.Delete")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -165,7 +165,7 @@ func (uc *UserController) ConfirmDelete(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *UserController) setSession(c *gin.Context) error {
+func (uc *User) setSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
@@ -187,7 +187,7 @@ func (uc *UserController) setSession(c *gin.Context) error {
 }
 
 // clearSession destroys the session
-func (uc *UserController) clearSession(c *gin.Context) error {
+func (uc *User) clearSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600

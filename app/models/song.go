@@ -5,11 +5,11 @@ import (
 )
 
 type (
-	SongModel struct {
+	Song struct {
 		DbHandle *sql.DB
 	}
 
-	song struct {
+	songData struct {
 		Id      string
 		Title   string
 		Author  string
@@ -19,8 +19,8 @@ type (
 	}
 )
 
-func (sm *SongModel) GetAll() ([]*song, error) {
-	songs := []*song{}
+func (sm *Song) GetAll() ([]*songData, error) {
+	songs := []*songData{}
 
 	stmt, err := sm.DbHandle.Prepare("SELECT * FROM songs")
 	if err != nil {
@@ -35,13 +35,13 @@ func (sm *SongModel) GetAll() ([]*song, error) {
 	var id, title, author, album, genre, addedby string
 	for rows.Next() {
 		rows.Scan(&id, &title, &author, &album, &genre, &addedby)
-		songs = append(songs, &song{Id: id, Title: title, Author: author, Genre: genre,
+		songs = append(songs, &songData{Id: id, Title: title, Author: author, Genre: genre,
 			AddedBy: addedby})
 	}
 
 	return songs, nil
 }
 
-func (sm *SongModel) Get(id string) {
+func (sm *Song) Get(id string) {
 
 }
