@@ -4,7 +4,26 @@ import (
 	"database/sql"
 	"strconv"
 	"time"
+
+	"github.com/adred/wiki-player/app/mocks/mockModels"
 )
+
+// UserModel is the Interface for User models
+type UserModel interface {
+	UserData(field, value string) (*UserData, error)
+	Update() error
+	Create() (string, error)
+	Delete(nonce string) error
+}
+
+// NewUser returns instance of User models
+func NewUser(dbHandle *sql.DB, ud *UserData, mode string) UserModel {
+	if mode == "test" {
+		return &mockModels.User{DbHandle: dbHandle, UserData: ud}
+	} else {
+		return &User{DbHandle: dbHandle, UserData: ud}
+	}
+}
 
 type (
 	// User is type of this class
@@ -25,8 +44,8 @@ type (
 	}
 )
 
-// Get returns UserData instance
-func (um *User) Get(field, value string) (*UserData, error) {
+// UserData returns UserData instance
+func (um *User) UserData(field, value string) (*UserData, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"

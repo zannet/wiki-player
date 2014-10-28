@@ -4,6 +4,7 @@ import (
     "time"
 
     "github.com/adred/wiki-player/app/models"
+    "github.com/adred/wiki-player/app/mockModels"
     "github.com/adred/wiki-player/lib"
     "github.com/gin-gonic/gin"
     "github.com/goinggo/tracelog"

@@ -4,11 +4,33 @@ import (
 	"time"
 
 	"github.com/adred/wiki-player/app/models"
+	"github.com/adred/wiki-player/app/mocks/mockControllers"
+	"github.com/adred/wiki-player/app/mocks/mockModels"
 	"github.com/adred/wiki-player/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
 )
+
+
+// UserController is the Interface for User controllers
+type UserController interface {
+	Login(c *gin.Context)
+	Logout(c *gin.Context)
+	Register(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+	ConfirmDelete(c *gin.Context)
+}
+
+// NewUser returns instance of User controller
+func NewUser(um models.UserModel, store *sessions.CookieStore, mode string) UserController {
+	if mode == "test" {
+		return &mockControllers.User{UM: um.(*mockModels.User), Store: store}
+	} else {
+		return &User{UM: um.(*models.User), Store: store}
+	}
+}
 
 type (
 	// User is the type of this class
