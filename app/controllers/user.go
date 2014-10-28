@@ -70,10 +70,10 @@ func (uc *User) Login(c *gin.Context) {
 	c.Bind(&g)
 
 	// Check if user exists and get UserData instance if it does
-	ud, err := uc.UM.Get("email", g.Username)
+	ud, err := uc.UM.UserData("email", g.Username)
 	if err != nil {
 		// Mybe the user provided the username instead of email
-		ud, err = uc.UM.Get("username", g.Username)
+		ud, err = uc.UM.UserData("username", g.Username)
 		if err != nil {
 			tracelog.CompletedError(err, "User", "uc.UM.NewUserModel")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
