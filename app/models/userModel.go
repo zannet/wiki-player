@@ -5,29 +5,29 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/adred/wiki-player/app/mocks/mockModels"
+	"github.com/adred/wiki-player/mocks/mockModels"
 )
 
 // UserModel is the Interface for User models
-type UserModel interface {
-	UserData(field, value string) (*UserData, error)
+type UserModelInterface interface {
+	User(field, value string) (interface{}, error)
 	Update() error
 	Create() (string, error)
 	Delete(nonce string) error
 }
 
-// NewUser returns instance of User models
-func NewUser(dbHandle *sql.DB, ud *UserData, mode string) UserModel {
+// NewUserModel returns instance of User models
+func NewUserModel(dbHandle *sql.DB, ud interface{}, mode string) UserModelInterface {
 	if mode == "test" {
-		return &mockModels.User{DbHandle: dbHandle, UserData: ud}
+		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud.(*mockModels.UserData)}
 	} else {
-		return &User{DbHandle: dbHandle, UserData: ud}
+		return &UserModel{DbHandle: dbHandle, UserData: ud.(*UserData)}
 	}
 }
 
 type (
-	// User is type of this class
-	User struct {
+	// UserController is type of this class
+	UserController struct {
 		DbHandle *sql.DB
 		UserData *UserData
 	}
@@ -44,8 +44,8 @@ type (
 	}
 )
 
-// UserData returns UserData instance
-func (um *User) UserData(field, value string) (*UserData, error) {
+// User returns UserData instance
+func (um *UserController) User(field, value string) (*UserData, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -77,7 +77,7 @@ func (um *User) UserData(field, value string) (*UserData, error) {
 }
 
 // Update updates the user
-func (um *User) Update() error {
+func (um *UserController) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (um *User) Update() error {
 }
 
 // Create creates a user
-func (um *User) Create() (string, error) {
+func (um *UserController) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
@@ -118,7 +118,7 @@ func (um *User) Create() (string, error) {
 }
 
 // Delete deletes a user
-func (um *User) Delete(nonce string) error {
+func (um *UserController) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err

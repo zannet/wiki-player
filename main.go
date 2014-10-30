@@ -29,15 +29,15 @@ func main() {
 	defer dbHandle.Close()
 
 	// Init Models
-	sm := &models.Song{DbHandle: dbHandle}
-	nm := &models.Nonce{DbHandle: dbHandle}
-	um := &models.User{DbHandle: dbHandle, UserData: &models.UserData{}}
+	sm := &models.SongModel{DbHandle: dbHandle}
+	nm := &models.NonceModel{DbHandle: dbHandle}
+	um := &models.UserModel{DbHandle: dbHandle, UserData: &models.UserData{}}
 
 	// Init Controllers
-	sc := &controllers.Song{SM: sm}
-	nc := &controllers.Nonce{NM: nm}
-	uc := &controllers.User{UM: um, Store: store}
-	vc := &controllers.View{Store: store}
+	sc := &controllers.SongController{SM: sm}
+	nc := &controllers.NonceController{NM: nm}
+	uc := &controllers.UserController{UM: um, Store: store}
+	vc := &controllers.ViewController{Store: store}
 
 	// Init Gin
 	mux := gin.Default()
