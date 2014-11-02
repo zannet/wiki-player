@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"time"
+	"fmt"
 
 	"github.com/adred/wiki-player/app/models"
 	"github.com/adred/wiki-player/mocks/mockControllers"
@@ -24,7 +25,7 @@ type UserControllerInterface interface {
 }
 
 // NewUserController returns instance of User controller
-func NewUserController(um models.UserModel, store *sessions.CookieStore, mode string) UserControllerInterface {
+func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) UserControllerInterface {
 	if mode == "test" {
 		return &mockControllers.UserController{UM: um.(*mockModels.UserModel), Store: store}
 	} else {
@@ -33,9 +34,9 @@ func NewUserController(um models.UserModel, store *sessions.CookieStore, mode st
 }
 
 type (
-	// NewUserController is the type of this class
+	// UserController is the type of this class
 	UserController struct {
-		UM    *models.User
+		UM    *models.UserModel
 		Store *sessions.CookieStore
 	}
 
@@ -83,7 +84,7 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
-	if hash != ud.Hash {
+	if hash != ud["Hash"] {
 		tracelog.CompletedError(err, "NewUserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
@@ -102,26 +103,26 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 // Logout logs the user out
-func (uc *NewUserController) Logout(c *gin.Context) {
+func (uc *UserController) Logout(c *gin.Context) {
 	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
 // Register registers the user
-func (uc *NewUserController) Register(c *gin.Context) {
+func (uc *UserController) Register(c *gin.Context) {
 	var r Register
 	// Bind params
 	c.Bind(&r)
 
 	// Set user data
-	uc.UM.UserData.Email = r.Email
-	uc.UM.UserData.Username = r.Username
-	uc.UM.UserData.FirstName = r.FirstName
-	uc.UM.UserData.LastName = r.LastName
-	uc.UM.UserData.Hash = lib.ComputeHmac256(r.Password, lib.ConfigEntry("Salt"))
-	uc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
-	uc.UM.UserData.Joined = time.Now().Local()
+	uc.UM.UserData["Email"] = r.Email
+	uc.UM.UserData["Username"] = r.Username
+	uc.UM.UserData["FirstName"] = r.FirstName
+	uc.UM.UserData["LastName"] = r.LastName
+	uc.UM.UserData["Hash"] = lib.ComputeHmac256(r.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData["AccessLevel"] = "10" // Figure out how to set this properly
+	uc.UM.UserData["Joined"] = fmt.Sprint(time.Now())
 
 	// Create user
 	id, err := uc.UM.Create()
@@ -132,7 +133,7 @@ func (uc *NewUserController) Register(c *gin.Context) {
 	}
 
 	// Set user ID to last inserted ID
-	uc.UM.UserData.Id = id
+	uc.UM.UserData["Id"] = id
 
 	// Set session
 	err = uc.setSession(c)
@@ -146,16 +147,16 @@ func (uc *NewUserController) Register(c *gin.Context) {
 }
 
 // Update udpates the user
-func (uc *NewUserController) Update(c *gin.Context) {
+func (uc *UserController) Update(c *gin.Context) {
 	var u Update
 	// Bind params
 	c.Bind(&u)
 
 	// Set user data
-	uc.UM.UserData.Email = u.Email
-	uc.UM.UserData.FirstName = u.FirstName
-	uc.UM.UserData.LastName = u.LastName
-	uc.UM.UserData.Hash = lib.ComputeHmac256(u.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData["Email"] = u.Email
+	uc.UM.UserData["FirstName"] = u.FirstName
+	uc.UM.UserData["LastName"] = u.LastName
+	uc.UM.UserData["Hash"] = lib.ComputeHmac256(u.Password, lib.ConfigEntry("Salt"))
 
 	// Update user
 	err := uc.UM.Update()
@@ -169,12 +170,12 @@ func (uc *NewUserController) Update(c *gin.Context) {
 }
 
 // Delete sends delete confirmation email to the user
-func (uc *NewUserController) Delete(c *gin.Context) {
+func (uc *UserController) Delete(c *gin.Context) {
 	// Send email confirmaation here
 }
 
 // ConfirmDelete deletes the user
-func (uc *NewUserController) ConfirmDelete(c *gin.Context) {
+func (uc *UserController) ConfirmDelete(c *gin.Context) {
 	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
 	if err != nil {
@@ -187,17 +188,17 @@ func (uc *NewUserController) ConfirmDelete(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *NewUserController) setSession(c *gin.Context) error {
+func (uc *UserController) setSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
 	// Set some session values
-	session.Values["uid"] = uc.UM.UserData.Id
-	session.Values["email"] = uc.UM.UserData.Email
-	session.Values["username"] = uc.UM.UserData.Username
-	session.Values["firstName"] = uc.UM.UserData.FirstName
-	session.Values["lastName"] = uc.UM.UserData.LastName
-	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
+	session.Values["uid"] = uc.UM.UserData["Id"]
+	session.Values["email"] = uc.UM.UserData["Email"]
+	session.Values["username"] = uc.UM.UserData["Username"]
+	session.Values["firstName"] = uc.UM.UserData["FirstName"]
+	session.Values["lastName"] = uc.UM.UserData["LastName"]
+	session.Values["accessLevel"] = uc.UM.UserData["AccessLevel"]
 
 	// Save session
 	err := session.Save(c.Request, c.Writer)
@@ -209,7 +210,7 @@ func (uc *NewUserController) setSession(c *gin.Context) error {
 }
 
 // clearSession destroys the session
-func (uc *NewUserController) clearSession(c *gin.Context) error {
+func (uc *UserController) clearSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600

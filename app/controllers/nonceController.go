@@ -8,20 +8,20 @@ import (
 )
 
 type (
-	// Nonce is the type of this class
-	Nonce struct {
-		NM *models.Nonce
+	// NonceController is the type of this class
+	NonceController struct {
+		NM *models.NonceModel
 	}
 )
 
 // Create creates a nonce
-func (nc *Nonce) Create(c *gin.Context) {
+func (nc *NonceController) Create(c *gin.Context) {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
 	nonce, err := nc.NM.Create(session.Values["uid"].(string))
 	if err != nil {
-		tracelog.CompletedError(err, "Nonce", "Create")
+		tracelog.CompletedError(err, "NonceController", "Create")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 
 		return

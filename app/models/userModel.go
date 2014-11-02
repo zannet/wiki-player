@@ -4,55 +4,45 @@ import (
 	"database/sql"
 	"strconv"
 	"time"
+	"fmt"
 
 	"github.com/adred/wiki-player/mocks/mockModels"
 )
 
 // UserModel is the Interface for User models
 type UserModelInterface interface {
-	User(field, value string) (interface{}, error)
+	User(field, value string) (map[string]string, error)
 	Update() error
 	Create() (string, error)
 	Delete(nonce string) error
 }
 
 // NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, ud interface{}, mode string) UserModelInterface {
+func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) UserModelInterface {
 	if mode == "test" {
-		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud.(*mockModels.UserData)}
+		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud}
 	} else {
-		return &UserModel{DbHandle: dbHandle, UserData: ud.(*UserData)}
+		return &UserModel{DbHandle: dbHandle, UserData: ud}
 	}
 }
 
 type (
-	// UserController is type of this class
-	UserController struct {
+	// UserModel is type of this class
+	UserModel struct {
 		DbHandle *sql.DB
-		UserData *UserData
-	}
-	// UserData defines the fields of the users table
-	UserData struct {
-		Id          string
-		Email       string
-		Username    string
-		FirstName   string
-		LastName    string
-		Hash        string
-		AccessLevel int
-		Joined      time.Time
+		UserData map[string]string
 	}
 )
 
 // User returns UserData instance
-func (um *UserController) User(field, value string) (*UserData, error) {
+func (um *UserModel) User(field, value string) (map[string]string, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
 
 	stmt, err := um.DbHandle.Prepare(query)
 	if err != nil {
-		return &UserData{}, err
+		return nil, err
 	}
 
 	var accessLevel int
@@ -61,29 +51,29 @@ func (um *UserController) User(field, value string) (*UserData, error) {
 
 	err = stmt.QueryRow(value).Scan(&id, &email, &username, &firstName, &lastName, &hash, &accessLevel, &joined)
 	if err != nil {
-		return &UserData{}, err
+		return nil, err
 	}
 
-	return &UserData{
-		Id:          id,
-		Email:       email,
-		Username:    username,
-		FirstName:   firstName,
-		LastName:    lastName,
-		Hash:        hash,
-		AccessLevel: accessLevel,
-		Joined:      joined,
+	return map[string]string{
+		"Id":          id,
+		"Email":       email,
+		"Username":    username,
+		"FirstName":   firstName,
+		"LastName":    lastName,
+		"Hash":        hash,
+		"AccessLevel": strconv.Itoa(accessLevel),
+		"Joined":      fmt.Sprint(joined),
 	}, nil
 }
 
 // Update updates the user
-func (um *UserController) Update() error {
+func (um *UserModel) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.Exec(um.UserData.Email, um.UserData.FirstName, um.UserData.LastName, um.UserData.Hash, um.UserData.Id)
+	res, err := stmt.Exec(um.UserData["Email"], um.UserData["FirstName"], um.UserData["LastName"], um.UserData["Hash"], um.UserData["Id"])
 	if err != nil {
 		return err
 	}
@@ -97,14 +87,24 @@ func (um *UserController) Update() error {
 }
 
 // Create creates a user
-func (um *UserController) Create() (string, error) {
+func (um *UserModel) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
 	}
 
-	res, err := stmt.Exec(um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
-		um.UserData.Hash, um.UserData.AccessLevel, um.UserData.Joined)
+	joined, err := time.Parse(time.RFC3339, um.UserData["Joined"])
+	if err != nil {
+		return "", err
+	}
+
+	accessLevel, err := strconv.Atoi(um.UserData["AccessLevel"])
+	if err != nil {
+		return "", err
+	}
+
+	res, err := stmt.Exec(um.UserData["Email"], um.UserData["Username"], um.UserData["FirstName"], um.UserData["LastName"],
+		um.UserData["Hash"], accessLevel, joined)
 	if err != nil {
 		return "", err
 	}
@@ -118,7 +118,7 @@ func (um *UserController) Create() (string, error) {
 }
 
 // Delete deletes a user
-func (um *UserController) Delete(nonce string) error {
+func (um *UserModel) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err

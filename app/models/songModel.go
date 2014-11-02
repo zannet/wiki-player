@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	Song struct {
+	SongModel struct {
 		DbHandle *sql.DB
 	}
 
@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func (sm *Song) GetAll() ([]*songData, error) {
+func (sm *SongModel) GetAll() ([]*songData, error) {
 	songs := []*songData{}
 
 	stmt, err := sm.DbHandle.Prepare("SELECT * FROM songs")
@@ -42,6 +42,6 @@ func (sm *Song) GetAll() ([]*songData, error) {
 	return songs, nil
 }
 
-func (sm *Song) Get(id string) {
+func (sm *SongModel) Get(id string) {
 
 }
