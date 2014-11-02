@@ -31,12 +31,12 @@ func main() {
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
 	nm := &models.NonceModel{DbHandle: dbHandle}
-	um := &models.UserModel{DbHandle: dbHandle, UserData: make(map[string]string)}
+	um := models.NewUserModel(dbHandle, make(map[string]string), "prod")
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
 	nc := &controllers.NonceController{NM: nm}
-	uc := &controllers.UserController{UM: um, Store: store}
+	uc := controllers.NewUserController(um, store, "prod")
 	vc := &controllers.ViewController{Store: store}
 
 	// Init Gin

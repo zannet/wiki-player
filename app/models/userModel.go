@@ -21,9 +21,11 @@ type UserModelInterface interface {
 func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) UserModelInterface {
 	if mode == "test" {
 		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud}
-	} else {
+	} else if (mode == "prod") {
 		return &UserModel{DbHandle: dbHandle, UserData: ud}
 	}
+
+	return nil
 }
 
 type (

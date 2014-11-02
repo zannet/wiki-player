@@ -31,6 +31,8 @@ func NewUserController(um models.UserModelInterface, store *sessions.CookieStore
 	} else {
 		return &UserController{UM: um.(*models.UserModel), Store: store}
 	}
+
+	return nil
 }
 
 type (
