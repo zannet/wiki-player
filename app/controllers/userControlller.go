@@ -26,7 +26,7 @@ type UserControllerInterface interface {
 
 // NewUserController returns instance of User controller
 func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) UserControllerInterface {
-	if mode == "test" {
+	if mode == "mock" {
 		return &mockControllers.UserController{UM: um.(*mockModels.UserModel), Store: store}
 	} else {
 		return &UserController{UM: um.(*models.UserModel), Store: store}

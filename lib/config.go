@@ -55,6 +55,7 @@ func MustLoadConfig() {
 		c := &config{}
 		err = decoder.Decode(&c)
 		if err != nil {
+			tracelog.CompletedError(err, "MustLoadConfig", "decoder.Decode")
 			panic(err.Error())
 		}
 

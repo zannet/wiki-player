@@ -19,9 +19,9 @@ type UserModelInterface interface {
 
 // NewUserModel returns instance of User models
 func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) UserModelInterface {
-	if mode == "test" {
+	if mode == "mock" {
 		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud}
-	} else if (mode == "prod") {
+	} else {
 		return &UserModel{DbHandle: dbHandle, UserData: ud}
 	}
 
