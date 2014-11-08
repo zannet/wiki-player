@@ -3,6 +3,7 @@ package controllers
 import (
 	"time"
 	"fmt"
+	"errors"
 
 	"github.com/adred/wiki-player/app/models"
 	"github.com/adred/wiki-player/mocks/mockControllers"
@@ -24,15 +25,17 @@ type UserControllerInterface interface {
 	ConfirmDelete(c *gin.Context)
 }
 
-// NewUserController returns instance of User controller
-func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) UserControllerInterface {
-	if mode == "mock" {
-		return &mockControllers.UserController{UM: um.(*mockModels.UserModel), Store: store}
-	} else {
-		return &UserController{UM: um.(*models.UserModel), Store: store}
-	}
+var errInvalidMode = errors.New("Invalid App Mode")
 
-	return nil
+// NewUserController returns instance of User controller
+func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) (UserControllerInterface, error) {
+	if mode == "mock" {
+		return &mockControllers.UserController{UM: um.(*mockModels.UserModel), Store: store}, nil
+	} else if mode == "real" {
+		return &UserController{UM: um.(*models.UserModel), Store: store}, nil
+	} else {
+		return nil, errInvalidMode
+	}
 }
 
 type (

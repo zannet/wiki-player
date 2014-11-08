@@ -31,13 +31,21 @@ func main() {
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
 	nm := &models.NonceModel{DbHandle: dbHandle}
-	um := models.NewUserModel(dbHandle, make(map[string]string), lib.EnvConfigEntry("Mode"))
+	um, err := models.NewUserModel(dbHandle, make(map[string]string), lib.EnvConfigEntry("Mode"))
+	if err != nil {
+		tracelog.CompletedError(err, "main", "Model creation failed")
+		panic(err.Error())
+	}
 
 	// Init Controllers
 	sc := &controllers.SongController{SM: sm}
 	nc := &controllers.NonceController{NM: nm}
-	uc := controllers.NewUserController(um, store, lib.EnvConfigEntry("Mode"))
 	vc := &controllers.ViewController{Store: store}
+	uc, err := controllers.NewUserController(um, store, lib.EnvConfigEntry("Mode"))
+	if err != nil {
+		tracelog.CompletedError(err, "main", "Controller creation failed")
+		panic(err.Error())
+	}
 
 	// Init Gin
 	mux := gin.Default()

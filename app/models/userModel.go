@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 	"fmt"
+	"errors"
 
 	"github.com/adred/wiki-player/mocks/mockModels"
 )
@@ -17,15 +18,17 @@ type UserModelInterface interface {
 	Delete(nonce string) error
 }
 
-// NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) UserModelInterface {
-	if mode == "mock" {
-		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud}
-	} else {
-		return &UserModel{DbHandle: dbHandle, UserData: ud}
-	}
+var errInvalidMode = errors.New("Invalid App Mode")
 
-	return nil
+// NewUserModel returns instance of User models
+func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) (UserModelInterface, error) {
+	if mode == "mock" {
+		return &mockModels.UserModel{DbHandle: dbHandle, UserData: ud}, nil
+	} else if mode == "real" {
+		return &UserModel{DbHandle: dbHandle, UserData: ud}, nil
+	} else {
+		return nil, errInvalidMode
+	}
 }
 
 type (
