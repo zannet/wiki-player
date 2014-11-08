@@ -1,6 +1,7 @@
 {
 	"Host": "localhost",
 	"Database": "wikiplayer",
+	"MockDatabase": "wikiplayermock",
 	"Driver": "mysql",
 	"Username": "root",
 	"Password": "redeye",
