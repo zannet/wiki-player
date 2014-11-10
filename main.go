@@ -31,7 +31,7 @@ func main() {
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
 	nm := &models.NonceModel{DbHandle: dbHandle}
-	um, err := models.NewUserModel(dbHandle, make(map[string]string), lib.EnvConfigEntry("Mode"))
+	um, err := models.NewUserModel(dbHandle, lib.EnvConfigEntry("Mode"))
 	if err != nil {
 		tracelog.CompletedError(err, "main", "Model creation failed")
 		panic(err.Error())

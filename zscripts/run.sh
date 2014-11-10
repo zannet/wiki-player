@@ -1,4 +1,4 @@
-export APP_MODE="mock"
+export APP_MODE="real"
 export APP_BRANCH="dev"
 
 cd $GOPATH/src/github.com/adred/wiki-player

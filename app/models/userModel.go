@@ -3,14 +3,13 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 )
 
 // UserModelInterface is the Interface for User models
 type UserModelInterface interface {
-	User(field, value string) (map[string]string, error)
+	User(field, value string) (*UserData, error)
 	Update() error
 	Create() (string, error)
 	Delete(nonce string) error
@@ -19,11 +18,11 @@ type UserModelInterface interface {
 var errInvalidMode = errors.New("Invalid App Mode")
 
 // NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) (UserModelInterface, error) {
+func NewUserModel(dbHandle *sql.DB, mode string) (UserModelInterface, error) {
 	if mode == "mock" {
-		return &MockUserModel{DbHandle: dbHandle, UserData: ud}, nil
+		return &MockUserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
 	} else if mode == "real" {
-		return &UserModel{DbHandle: dbHandle, UserData: ud}, nil
+		return &UserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
 	} else {
 		return nil, errInvalidMode
 	}
@@ -33,12 +32,24 @@ type (
 	// UserModel is type of this class
 	UserModel struct {
 		DbHandle *sql.DB
-		UserData map[string]string
+		UserData *UserData
+	}
+
+	// UserData defines the fields of the users table
+	UserData struct {
+		Id          string
+		Email       string
+		Username    string
+		FirstName   string
+		LastName    string
+		Hash        string
+		AccessLevel int
+		Joined      time.Time
 	}
 )
 
 // User returns UserData instance
-func (um *UserModel) User(field, value string) (map[string]string, error) {
+func (um *UserModel) User(field, value string) (*UserData, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -57,15 +68,15 @@ func (um *UserModel) User(field, value string) (map[string]string, error) {
 		return nil, err
 	}
 
-	return map[string]string{
-		"Id":          id,
-		"Email":       email,
-		"Username":    username,
-		"FirstName":   firstName,
-		"LastName":    lastName,
-		"Hash":        hash,
-		"AccessLevel": strconv.Itoa(accessLevel),
-		"Joined":      fmt.Sprint(joined),
+	return &UserData{
+		Id:          id,
+		Email:       email,
+		Username:    username,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Hash:        hash,
+		AccessLevel: accessLevel,
+		Joined:      joined,
 	}, nil
 }
 
@@ -76,7 +87,7 @@ func (um *UserModel) Update() error {
 		return err
 	}
 
-	res, err := stmt.Exec(um.UserData["Email"], um.UserData["FirstName"], um.UserData["LastName"], um.UserData["Hash"], um.UserData["Id"])
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.FirstName, um.UserData.LastName, um.UserData.Hash, um.UserData.Id)
 	if err != nil {
 		return err
 	}
@@ -96,18 +107,8 @@ func (um *UserModel) Create() (string, error) {
 		return "", err
 	}
 
-	joined, err := time.Parse(time.RFC3339, um.UserData["Joined"])
-	if err != nil {
-		return "", err
-	}
-
-	accessLevel, err := strconv.Atoi(um.UserData["AccessLevel"])
-	if err != nil {
-		return "", err
-	}
-
-	res, err := stmt.Exec(um.UserData["Email"], um.UserData["Username"], um.UserData["FirstName"], um.UserData["LastName"],
-		um.UserData["Hash"], accessLevel, joined)
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
+		um.UserData.Hash, um.UserData.AccessLevel, um.UserData.Joined)
 	if err != nil {
 		return "", err
 	}

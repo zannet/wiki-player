@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -11,12 +10,12 @@ type (
 	// MockUserModel is type of this class
 	MockUserModel struct {
 		DbHandle *sql.DB
-		UserData map[string]string
+		UserData *UserData
 	}
 )
 
 // User returns UserData instance
-func (um *MockUserModel) User(field, value string) (map[string]string, error) {
+func (um *MockUserModel) User(field, value string) (*UserData, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -35,15 +34,15 @@ func (um *MockUserModel) User(field, value string) (map[string]string, error) {
 		return nil, err
 	}
 
-	return map[string]string{
-		"Id":          id,
-		"Email":       email,
-		"Username":    username,
-		"FirstName":   firstName,
-		"LastName":    lastName,
-		"Hash":        hash,
-		"AccessLevel": strconv.Itoa(accessLevel),
-		"Joined":      fmt.Sprint(joined),
+	return &UserData{
+		Id:          id,
+		Email:       email,
+		Username:    username,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Hash:        hash,
+		AccessLevel: accessLevel,
+		Joined:      joined,
 	}, nil
 }
 
@@ -54,7 +53,7 @@ func (um *MockUserModel) Update() error {
 		return err
 	}
 
-	res, err := stmt.Exec(um.UserData["Email"], um.UserData["FirstName"], um.UserData["LastName"], um.UserData["Hash"], um.UserData["Id"])
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.FirstName, um.UserData.LastName, um.UserData.Hash, um.UserData.Id)
 	if err != nil {
 		return err
 	}
@@ -74,18 +73,8 @@ func (um *MockUserModel) Create() (string, error) {
 		return "", err
 	}
 
-	joined, err := time.Parse(time.RFC3339, um.UserData["Joined"])
-	if err != nil {
-		return "", err
-	}
-
-	accessLevel, err := strconv.Atoi(um.UserData["AccessLevel"])
-	if err != nil {
-		return "", err
-	}
-
-	res, err := stmt.Exec(um.UserData["Email"], um.UserData["Username"], um.UserData["FirstName"], um.UserData["LastName"],
-		um.UserData["Hash"], accessLevel, joined)
+	res, err := stmt.Exec(um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
+		um.UserData.Hash, um.UserData.AccessLevel, um.UserData.Joined)
 	if err != nil {
 		return "", err
 	}

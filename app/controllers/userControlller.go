@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/adred/wiki-player/app/models"
@@ -86,7 +85,7 @@ func (uc *UserController) Login(c *gin.Context) {
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
-	if hash != ud["Hash"] {
+	if hash != ud.Hash {
 		tracelog.CompletedError(err, "NewUserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
@@ -118,13 +117,13 @@ func (uc *UserController) Register(c *gin.Context) {
 	c.Bind(&r)
 
 	// Set user data
-	uc.UM.UserData["Email"] = r.Email
-	uc.UM.UserData["Username"] = r.Username
-	uc.UM.UserData["FirstName"] = r.FirstName
-	uc.UM.UserData["LastName"] = r.LastName
-	uc.UM.UserData["Hash"] = lib.ComputeHmac256(r.Password, lib.ConfigEntry("Salt"))
-	uc.UM.UserData["AccessLevel"] = "10" // Figure out how to set this properly
-	uc.UM.UserData["Joined"] = fmt.Sprint(time.Now())
+	uc.UM.UserData.Email = r.Email
+	uc.UM.UserData.Username = r.Username
+	uc.UM.UserData.FirstName = r.FirstName
+	uc.UM.UserData.LastName = r.LastName
+	uc.UM.UserData.Hash = lib.ComputeHmac256(r.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
+	uc.UM.UserData.Joined = time.Now().Local()
 
 	// Create user
 	id, err := uc.UM.Create()
@@ -135,7 +134,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	}
 
 	// Set user ID to last inserted ID
-	uc.UM.UserData["Id"] = id
+	uc.UM.UserData.Id = id
 
 	// Set session
 	err = uc.setSession(c)
@@ -155,10 +154,10 @@ func (uc *UserController) Update(c *gin.Context) {
 	c.Bind(&u)
 
 	// Set user data
-	uc.UM.UserData["Email"] = u.Email
-	uc.UM.UserData["FirstName"] = u.FirstName
-	uc.UM.UserData["LastName"] = u.LastName
-	uc.UM.UserData["Hash"] = lib.ComputeHmac256(u.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData.Email = u.Email
+	uc.UM.UserData.FirstName = u.FirstName
+	uc.UM.UserData.LastName = u.LastName
+	uc.UM.UserData.Hash = lib.ComputeHmac256(u.Password, lib.ConfigEntry("Salt"))
 
 	// Update user
 	err := uc.UM.Update()
@@ -195,12 +194,12 @@ func (uc *UserController) setSession(c *gin.Context) error {
 	session := c.MustGet("session").(*sessions.Session)
 
 	// Set some session values
-	session.Values["uid"] = uc.UM.UserData["Id"]
-	session.Values["email"] = uc.UM.UserData["Email"]
-	session.Values["username"] = uc.UM.UserData["Username"]
-	session.Values["firstName"] = uc.UM.UserData["FirstName"]
-	session.Values["lastName"] = uc.UM.UserData["LastName"]
-	session.Values["accessLevel"] = uc.UM.UserData["AccessLevel"]
+	session.Values["uid"] = uc.UM.UserData.Id
+	session.Values["email"] = uc.UM.UserData.Email
+	session.Values["username"] = uc.UM.UserData.Username
+	session.Values["firstName"] = uc.UM.UserData.FirstName
+	session.Values["lastName"] = uc.UM.UserData.LastName
+	session.Values["accessLevel"] = uc.UM.UserData.AccessLevel
 
 	// Save session
 	err := session.Save(c.Request, c.Writer)
