@@ -2,43 +2,21 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
 )
 
-// UserModelInterface is the Interface for User models
-type UserModelInterface interface {
-	User(field, value string) (map[string]string, error)
-	Update() error
-	Create() (string, error)
-	Delete(nonce string) error
-}
-
-var errInvalidMode = errors.New("Invalid App Mode")
-
-// NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, ud map[string]string, mode string) (UserModelInterface, error) {
-	if mode == "mock" {
-		return &MockUserModel{DbHandle: dbHandle, UserData: ud}, nil
-	} else if mode == "real" {
-		return &UserModel{DbHandle: dbHandle, UserData: ud}, nil
-	} else {
-		return nil, errInvalidMode
-	}
-}
-
 type (
-	// UserModel is type of this class
-	UserModel struct {
+	// MockUserModel is type of this class
+	MockUserModel struct {
 		DbHandle *sql.DB
 		UserData map[string]string
 	}
 )
 
 // User returns UserData instance
-func (um *UserModel) User(field, value string) (map[string]string, error) {
+func (um *MockUserModel) User(field, value string) (map[string]string, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -70,7 +48,7 @@ func (um *UserModel) User(field, value string) (map[string]string, error) {
 }
 
 // Update updates the user
-func (um *UserModel) Update() error {
+func (um *MockUserModel) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -90,7 +68,7 @@ func (um *UserModel) Update() error {
 }
 
 // Create creates a user
-func (um *UserModel) Create() (string, error) {
+func (um *MockUserModel) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
@@ -121,7 +99,7 @@ func (um *UserModel) Create() (string, error) {
 }
 
 // Delete deletes a user
-func (um *UserModel) Delete(nonce string) error {
+func (um *MockUserModel) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err
