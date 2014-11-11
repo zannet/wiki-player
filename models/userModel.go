@@ -2,31 +2,9 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 	"time"
 )
-
-// UserModelInterface is the Interface for User models
-type UserModelInterface interface {
-	User(field, value string) (*UserData, error)
-	Update() error
-	Create() (string, error)
-	Delete(nonce string) error
-}
-
-var errInvalidMode = errors.New("Invalid App Mode")
-
-// NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, mode string) (UserModelInterface, error) {
-	if mode == "mock" {
-		return &MockUserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
-	} else if mode == "real" {
-		return &UserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
-	} else {
-		return nil, errInvalidMode
-	}
-}
 
 type (
 	// UserModel is type of this class

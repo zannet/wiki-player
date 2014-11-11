@@ -1,38 +1,14 @@
 package controllers
 
 import (
-	"errors"
 	"time"
 
-	"github.com/adred/wiki-player/app/models"
+	"github.com/adred/wiki-player/models"
 	"github.com/adred/wiki-player/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
 )
-
-// UserControllerInterface is the Interface for User controllers
-type UserControllerInterface interface {
-	Login(c *gin.Context)
-	Logout(c *gin.Context)
-	Register(c *gin.Context)
-	Update(c *gin.Context)
-	Delete(c *gin.Context)
-	ConfirmDelete(c *gin.Context)
-}
-
-var errInvalidMode = errors.New("Invalid App Mode")
-
-// NewUserController returns instance of User controller
-func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) (UserControllerInterface, error) {
-	if mode == "mock" {
-		return &MockUserController{UM: um.(*models.MockUserModel), Store: store}, nil
-	} else if mode == "real" {
-		return &UserController{UM: um.(*models.UserModel), Store: store}, nil
-	} else {
-		return nil, errInvalidMode
-	}
-}
 
 type (
 	// UserController is the type of this class

@@ -2171,7 +2171,7 @@ define("dag-map.umd",
     }
   });
 define("ember-application",
-  ["ember-metal/core","ember-runtime/system/lazy_load","ember-application/system/resolver","ember-application/system/application","ember-application/ext/controller"],
+  ["ember-metal/core","ember-runtime/system/lazy_load","ember-application/system/resolver","ember-application/systemlication","ember-application/ext/controller"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__) {
     "use strict";
     var Ember = __dependency1__["default"];
@@ -2382,7 +2382,7 @@ define("ember-application/ext/controller",
 
     __exports__["default"] = ControllerMixin;
   });
-define("ember-application/system/application",
+define("ember-application/systemlication",
   ["dag-map","container/container","ember-metal","ember-metal/property_get","ember-metal/property_set","ember-runtime/system/lazy_load","ember-runtime/system/namespace","ember-runtime/mixins/deferred","ember-application/system/resolver","ember-metal/platform","ember-metal/run_loop","ember-metal/lib","ember-runtime/controllers/controller","ember-metal/enumerable_lib","ember-runtime/controllers/object_controller","ember-runtime/controllers/array_controller","ember-handlebars/controls/select","ember-views/system/event_dispatcher","ember-views/system/jquery","ember-routing/system/route","ember-routing/system/router","ember-routing/location/hash_location","ember-routing/location/history_location","ember-routing/location/auto_location","ember-routing/location/none_location","ember-routing/system/cache","ember-extension-support/container_debug_adapter","ember-metal/core","ember-handlebars-compiler","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __dependency16__, __dependency17__, __dependency18__, __dependency19__, __dependency20__, __dependency21__, __dependency22__, __dependency23__, __dependency24__, __dependency25__, __dependency26__, __dependency27__, __dependency28__, __dependency29__, __exports__) {
     "use strict";
@@ -4361,7 +4361,7 @@ define("ember-extension-support/container_debug_adapter",
     });
   });
 define("ember-extension-support/data_adapter",
-  ["ember-metal/core","ember-metal/property_get","ember-metal/run_loop","ember-runtime/system/string","ember-runtime/system/namespace","ember-runtime/system/object","ember-runtime/system/native_array","ember-application/system/application","exports"],
+  ["ember-metal/core","ember-metal/property_get","ember-metal/run_loop","ember-runtime/system/string","ember-runtime/system/namespace","ember-runtime/system/object","ember-runtime/system/native_array","ember-application/systemlication","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
     "use strict";
     var Ember = __dependency1__["default"];
@@ -23058,7 +23058,7 @@ define("ember-routing/location/auto_location",
       */
       create: function (options) {
         if (options && options.rootURL) {
-          Ember.assert('rootURL must end with a trailing forward slash e.g. "/app/"',
+          Ember.assert('rootURL must end with a trailing forward slash e.g. "/"',
                        options.rootURL.charAt(options.rootURL.length-1) === '/');
           this.rootURL = options.rootURL;
         }
@@ -34201,7 +34201,7 @@ define("ember-runtime/mixins/target_action_support",
 
     __exports__["default"] = TargetActionSupport;
   });
-define("ember-runtime/system/application",
+define("ember-runtime/systemlication",
   ["ember-runtime/system/namespace","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
@@ -38365,7 +38365,7 @@ define("ember-testing/support",
     });
   });
 define("ember-testing/test",
-  ["ember-metal/core","ember-metal/run_loop","ember-metal/platform","ember-runtime/compare","ember-runtime/ext/rsvp","ember-testing/setup_for_testing","ember-application/system/application","exports"],
+  ["ember-metal/core","ember-metal/run_loop","ember-metal/platform","ember-runtime/compare","ember-runtime/ext/rsvp","ember-testing/setup_for_testing","ember-application/systemlication","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
     "use strict";
     var Ember = __dependency1__["default"];
@@ -40632,7 +40632,7 @@ define("ember-views/views/component",
       {{#app-profile person=currentUser}}
         <p>Admin mode</p>
         {{! Executed in the controller's context. }}
-      {{/app-profile}}
+      {{-profile}}
       ```
 
       ```handlebars
