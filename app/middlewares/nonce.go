@@ -3,7 +3,7 @@ package middlewares
 import (
 	"errors"
 
-	"github.com/adred/wiki-player/models"
+	"github.com/adred/wiki-player/app/models"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 )

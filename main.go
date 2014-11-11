@@ -1,10 +1,9 @@
-package wikiPlayer
+package main
 
 import (
-	"github.com/adred/wiki-player/factory"
-	"github.com/adred/wiki-player/controllers"
-	"github.com/adred/wiki-player/middlewares"
-	"github.com/adred/wiki-player/models"
+	"github.com/adred/wiki-player/app/controllers"
+	"github.com/adred/wiki-player/app/middlewares"
+	"github.com/adred/wiki-player/app/models"
 	"github.com/adred/wiki-player/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
@@ -32,7 +31,7 @@ func main() {
 	// Init Models
 	sm := &models.SongModel{DbHandle: dbHandle}
 	nm := &models.NonceModel{DbHandle: dbHandle}
-	um, err := factory.NewUserModel(dbHandle, lib.EnvConfigEntry("Mode"))
+	um, err := models.NewUserModel(dbHandle, lib.EnvConfigEntry("Mode"))
 	if err != nil {
 		tracelog.CompletedError(err, "main", "Model creation failed")
 		panic(err.Error())
@@ -42,7 +41,7 @@ func main() {
 	sc := &controllers.SongController{SM: sm}
 	nc := &controllers.NonceController{NM: nm}
 	vc := &controllers.ViewController{Store: store}
-	uc, err := factory.NewUserController(um, store, lib.EnvConfigEntry("Mode"))
+	uc, err := controllers.NewUserController(um, store, lib.EnvConfigEntry("Mode"))
 	if err != nil {
 		tracelog.CompletedError(err, "main", "Controller creation failed")
 		panic(err.Error())
@@ -52,7 +51,7 @@ func main() {
 	mux := gin.Default()
 
 	// Load templates
-	mux.LoadHTMLGlob("views/*")
+	mux.LoadHTMLGlob("app/views/*")
 
 	// Serve static files
 	mux.Static("/public", lib.ConfigEntry("StaticDir"))
