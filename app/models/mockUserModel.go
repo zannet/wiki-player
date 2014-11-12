@@ -4,18 +4,32 @@ import (
 	"database/sql"
 	"strconv"
 	"time"
+
+	"github.com/adred/wiki-player/app/interfaces"
 )
 
 type (
 	// MockUserModel is type of this class
 	MockUserModel struct {
 		DbHandle *sql.DB
-		UserData *UserData
+		UserData *mockUserData
+	}
+
+	// mockUserData defines the fields of the users table
+	mockUserData struct {
+		Id          string
+		Email       string
+		Username    string
+		FirstName   string
+		LastName    string
+		Hash        string
+		AccessLevel int
+		Joined      time.Time
 	}
 )
 
 // User returns UserData instance
-func (um *MockUserModel) User(field, value string) (*UserData, error) {
+func (um *MockUserModel) User(field, value string) (interfaces.UserModelInterface, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -34,15 +48,17 @@ func (um *MockUserModel) User(field, value string) (*UserData, error) {
 		return nil, err
 	}
 
-	return &UserData{
-		Id:          id,
-		Email:       email,
-		Username:    username,
-		FirstName:   firstName,
-		LastName:    lastName,
-		Hash:        hash,
-		AccessLevel: accessLevel,
-		Joined:      joined,
+	return &MockUserModel{
+		UserData: &mockUserData{
+			Id:          id,
+			Email:       email,
+			Username:    username,
+			FirstName:   firstName,
+			LastName:    lastName,
+			Hash:        hash,
+			AccessLevel: accessLevel,
+			Joined:      joined,
+		},
 	}, nil
 }
 

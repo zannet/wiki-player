@@ -2,41 +2,21 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 	"time"
+
+	"github.com/adred/wiki-player/app/interfaces"
 )
-
-// UserModelInterface is the Interface for User models
-type UserModelInterface interface {
-	User(field, value string) (*UserData, error)
-	Update() error
-	Create() (string, error)
-	Delete(nonce string) error
-}
-
-var errInvalidMode = errors.New("Invalid App Mode")
-
-// NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, mode string) (UserModelInterface, error) {
-	if mode == "mock" {
-		return &MockUserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
-	} else if mode == "real" {
-		return &UserModel{DbHandle: dbHandle, UserData: &UserData{}}, nil
-	} else {
-		return nil, errInvalidMode
-	}
-}
 
 type (
 	// UserModel is type of this class
 	UserModel struct {
 		DbHandle *sql.DB
-		UserData *UserData
+		UserData *userData
 	}
 
-	// UserData defines the fields of the users table
-	UserData struct {
+	// userData defines the fields of the users table
+	userData struct {
 		Id          string
 		Email       string
 		Username    string
@@ -49,7 +29,7 @@ type (
 )
 
 // User returns UserData instance
-func (um *UserModel) User(field, value string) (*UserData, error) {
+func (um *UserModel) User(field, value string) (interfaces.UserModelInterface, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -68,15 +48,17 @@ func (um *UserModel) User(field, value string) (*UserData, error) {
 		return nil, err
 	}
 
-	return &UserData{
-		Id:          id,
-		Email:       email,
-		Username:    username,
-		FirstName:   firstName,
-		LastName:    lastName,
-		Hash:        hash,
-		AccessLevel: accessLevel,
-		Joined:      joined,
+	return &UserModel{
+		UserData: &userData{
+			Id:          id,
+			Email:       email,
+			Username:    username,
+			FirstName:   firstName,
+			LastName:    lastName,
+			Hash:        hash,
+			AccessLevel: accessLevel,
+			Joined:      joined,
+		},
 	}, nil
 }
 

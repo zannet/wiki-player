@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"time"
 
 	"github.com/adred/wiki-player/app/models"
@@ -10,29 +9,6 @@ import (
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
 )
-
-// UserControllerInterface is the Interface for User controllers
-type UserControllerInterface interface {
-	Login(c *gin.Context)
-	Logout(c *gin.Context)
-	Register(c *gin.Context)
-	Update(c *gin.Context)
-	Delete(c *gin.Context)
-	ConfirmDelete(c *gin.Context)
-}
-
-var errInvalidMode = errors.New("Invalid App Mode")
-
-// NewUserController returns instance of User controller
-func NewUserController(um models.UserModelInterface, store *sessions.CookieStore, mode string) (UserControllerInterface, error) {
-	if mode == "mock" {
-		return &MockUserController{UM: um.(*models.MockUserModel), Store: store}, nil
-	} else if mode == "real" {
-		return &UserController{UM: um.(*models.UserModel), Store: store}, nil
-	} else {
-		return nil, errInvalidMode
-	}
-}
 
 type (
 	// UserController is the type of this class
@@ -72,27 +48,29 @@ func (uc *UserController) Login(c *gin.Context) {
 	c.Bind(&g)
 
 	// Check if user exists and get UserData instance if it does
-	ud, err := uc.UM.User("email", g.Username)
+	i, err := uc.UM.User("email", g.Username)
 	if err != nil {
 		// Mybe the user provided the username instead of email
-		ud, err = uc.UM.User("username", g.Username)
-		if err != nil {
+		i, err = uc.UM.User("username", g.Username)
+		if i != nil {
 			tracelog.CompletedError(err, "NewUserController", "uc.UM.NewUserModel")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
 			return
 		}
 	}
+	// Assert as UserModel
+	user := i.(*models.UserModel)
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
-	if hash != ud.Hash {
+	if hash != user.UserData.Hash {
 		tracelog.CompletedError(err, "NewUserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
 	}
 
 	// Set session
-	uc.UM.UserData = ud
+	uc.UM.UserData = user.UserData
 	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "NewUserController", "uc.setSession")

@@ -48,27 +48,29 @@ func (uc *MockUserController) Login(c *gin.Context) {
 	c.Bind(&g)
 
 	// Check if user exists and get UserData instance if it does
-	ud, err := uc.UM.User("email", g.Username)
+	i, err := uc.UM.User("email", g.Username)
 	if err != nil {
 		// Mybe the user provided the username instead of email
-		ud, err = uc.UM.User("username", g.Username)
+		i, err = uc.UM.User("username", g.Username)
 		if err != nil {
 			tracelog.CompletedError(err, "NewUserController", "uc.UM.NewUserModel")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
 			return
 		}
 	}
+	// Assert as UserModel
+	user := i.(*models.MockUserModel)
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
-	if hash != ud.Hash {
+	if hash != user.UserData.Hash {
 		tracelog.CompletedError(err, "NewUserController", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
 	}
 
 	// Set session
-	uc.UM.UserData = ud
+	uc.UM.UserData = user.UserData
 	err = uc.setSession(c)
 	if err != nil {
 		tracelog.CompletedError(err, "NewUserController", "uc.setSession")
