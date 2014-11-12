@@ -1,4 +1,4 @@
-package models
+package mockModels
 
 import (
 	"database/sql"
@@ -9,14 +9,14 @@ import (
 )
 
 type (
-	// MockUser is type of this class
-	MockUser struct {
+	// User is type of this class
+	User struct {
 		DbHandle *sql.DB
-		UserData *mockUserData
+		UserData *userData
 	}
 
-	// mockUserData defines the fields of the users table
-	mockUserData struct {
+	// userData defines the fields of the users table
+	userData struct {
 		Id          string
 		Email       string
 		Username    string
@@ -29,7 +29,7 @@ type (
 )
 
 // User returns UserData instance
-func (um *MockUser) User(field, value string) (interfaces.UserModel, error) {
+func (um *User) User(field, value string) (interfaces.UserModel, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -48,8 +48,8 @@ func (um *MockUser) User(field, value string) (interfaces.UserModel, error) {
 		return nil, err
 	}
 
-	return &MockUser{
-		UserData: &mockUserData{
+	return &User{
+		UserData: &userData{
 			Id:          id,
 			Email:       email,
 			Username:    username,
@@ -63,7 +63,7 @@ func (um *MockUser) User(field, value string) (interfaces.UserModel, error) {
 }
 
 // Update updates the user
-func (um *MockUser) Update() error {
+func (um *User) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (um *MockUser) Update() error {
 }
 
 // Create creates a user
-func (um *MockUser) Create() (string, error) {
+func (um *User) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
@@ -104,7 +104,7 @@ func (um *MockUser) Create() (string, error) {
 }
 
 // Delete deletes a user
-func (um *MockUser) Delete(nonce string) error {
+func (um *User) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err

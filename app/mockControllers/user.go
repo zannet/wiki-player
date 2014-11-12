@@ -1,9 +1,9 @@
-package controllers
+package mockControllers
 
 import (
 	"time"
 
-	"github.com/adred/wiki-player/app/models"
+	"github.com/adred/wiki-player/app/mockModels"
 	"github.com/adred/wiki-player/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
@@ -11,20 +11,20 @@ import (
 )
 
 type (
-	// MockUser is the type of this class
-	MockUser struct {
-		UM    *models.MockUser
+	// User is the type of this class
+	User struct {
+		UM    *mockModels.User
 		Store *sessions.CookieStore
 	}
 
-	// MockLogin struct is used for login payload binding
-	MockLogin struct {
+	// Login struct is used for login payload binding
+	Login struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
-	// MockRegister struct is used for register payload binding
-	MockRegister struct {
+	// Register struct is used for register payload binding
+	Register struct {
 		Email     string `json:"email" binding:"required"`
 		Username  string `json:"username" binding:"required"`
 		Password  string `json:"password" binding:"required"`
@@ -32,8 +32,8 @@ type (
 		LastName  string `json:"last_name" binding:"required"`
 	}
 
-	// MockUpdate struct is used for update payload binding
-	MockUpdate struct {
+	// Update struct is used for update payload binding
+	Update struct {
 		Email     string `json:"email" binding:"required"`
 		Password  string `json:"password" binding:"required"`
 		FirstName string `json:"first_name" binding:"required"`
@@ -42,7 +42,7 @@ type (
 )
 
 // Login logs the user in
-func (uc *MockUser) Login(c *gin.Context) {
+func (uc *User) Login(c *gin.Context) {
 	var g Login
 	// Bind params
 	c.Bind(&g)
@@ -59,7 +59,7 @@ func (uc *MockUser) Login(c *gin.Context) {
 		}
 	}
 	// Assert as User
-	user := i.(*models.MockUser)
+	user := i.(*mockModels.User)
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
@@ -82,14 +82,14 @@ func (uc *MockUser) Login(c *gin.Context) {
 }
 
 // Logout logs the user out
-func (uc *MockUser) Logout(c *gin.Context) {
+func (uc *User) Logout(c *gin.Context) {
 	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
 // Register registers the user
-func (uc *MockUser) Register(c *gin.Context) {
+func (uc *User) Register(c *gin.Context) {
 	var r Register
 	// Bind params
 	c.Bind(&r)
@@ -126,7 +126,7 @@ func (uc *MockUser) Register(c *gin.Context) {
 }
 
 // Update udpates the user
-func (uc *MockUser) Update(c *gin.Context) {
+func (uc *User) Update(c *gin.Context) {
 	var u Update
 	// Bind params
 	c.Bind(&u)
@@ -149,12 +149,12 @@ func (uc *MockUser) Update(c *gin.Context) {
 }
 
 // Delete sends delete confirmation email to the user
-func (uc *MockUser) Delete(c *gin.Context) {
+func (uc *User) Delete(c *gin.Context) {
 	// Send email confirmaation here
 }
 
 // ConfirmDelete deletes the user
-func (uc *MockUser) ConfirmDelete(c *gin.Context) {
+func (uc *User) ConfirmDelete(c *gin.Context) {
 	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
 	if err != nil {
@@ -167,7 +167,7 @@ func (uc *MockUser) ConfirmDelete(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *MockUser) setSession(c *gin.Context) error {
+func (uc *User) setSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
@@ -189,7 +189,7 @@ func (uc *MockUser) setSession(c *gin.Context) error {
 }
 
 // clearSession destroys the session
-func (uc *MockUser) clearSession(c *gin.Context) error {
+func (uc *User) clearSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600
