@@ -9,14 +9,14 @@ import (
 )
 
 type (
-	// UserModel is type of this class
-	UserModel struct {
+	// MockUser is type of this class
+	MockUser struct {
 		DbHandle *sql.DB
-		UserData *userData
+		UserData *mockUserData
 	}
 
-	// userData defines the fields of the users table
-	userData struct {
+	// mockUserData defines the fields of the users table
+	mockUserData struct {
 		Id          string
 		Email       string
 		Username    string
@@ -29,7 +29,7 @@ type (
 )
 
 // User returns UserData instance
-func (um *UserModel) User(field, value string) (interfaces.UserModelInterface, error) {
+func (um *MockUser) User(field, value string) (interfaces.UserModel, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"
@@ -48,8 +48,8 @@ func (um *UserModel) User(field, value string) (interfaces.UserModelInterface, e
 		return nil, err
 	}
 
-	return &UserModel{
-		UserData: &userData{
+	return &MockUser{
+		UserData: &mockUserData{
 			Id:          id,
 			Email:       email,
 			Username:    username,
@@ -63,7 +63,7 @@ func (um *UserModel) User(field, value string) (interfaces.UserModelInterface, e
 }
 
 // Update updates the user
-func (um *UserModel) Update() error {
+func (um *MockUser) Update() error {
 	stmt, err := um.DbHandle.Prepare("UPDATE users SET email = ?, first_name = ?, last_name = ?, hash = ? WHERE id = ?")
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (um *UserModel) Update() error {
 }
 
 // Create creates a user
-func (um *UserModel) Create() (string, error) {
+func (um *MockUser) Create() (string, error) {
 	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return "", err
@@ -104,7 +104,7 @@ func (um *UserModel) Create() (string, error) {
 }
 
 // Delete deletes a user
-func (um *UserModel) Delete(nonce string) error {
+func (um *MockUser) Delete(nonce string) error {
 	stmt, err := um.DbHandle.Prepare("DELETE FROM users WHERE nonce = ?")
 	if err != nil {
 		return err

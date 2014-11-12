@@ -18,7 +18,7 @@ type (
 var errNonce = errors.New("Empty or no nonce sent.")
 
 // Nonce verifies the nonce attached to a request
-func Nonce(nm *models.NonceModel) gin.HandlerFunc {
+func Nonce(nm *models.Nonce) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var n N
 		// Bind params

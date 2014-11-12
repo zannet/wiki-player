@@ -11,20 +11,20 @@ import (
 )
 
 type (
-	// UserController is the type of this class
-	UserController struct {
-		UM    *models.UserModel
+	// MockUser is the type of this class
+	MockUser struct {
+		UM    *models.MockUser
 		Store *sessions.CookieStore
 	}
 
-	// Login struct is used for login payload binding
-	Login struct {
+	// MockLogin struct is used for login payload binding
+	MockLogin struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
-	// Register struct is used for register payload binding
-	Register struct {
+	// MockRegister struct is used for register payload binding
+	MockRegister struct {
 		Email     string `json:"email" binding:"required"`
 		Username  string `json:"username" binding:"required"`
 		Password  string `json:"password" binding:"required"`
@@ -32,8 +32,8 @@ type (
 		LastName  string `json:"last_name" binding:"required"`
 	}
 
-	// Update struct is used for update payload binding
-	Update struct {
+	// MockUpdate struct is used for update payload binding
+	MockUpdate struct {
 		Email     string `json:"email" binding:"required"`
 		Password  string `json:"password" binding:"required"`
 		FirstName string `json:"first_name" binding:"required"`
@@ -42,7 +42,7 @@ type (
 )
 
 // Login logs the user in
-func (uc *UserController) Login(c *gin.Context) {
+func (uc *MockUser) Login(c *gin.Context) {
 	var g Login
 	// Bind params
 	c.Bind(&g)
@@ -52,19 +52,19 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		// Mybe the user provided the username instead of email
 		i, err = uc.UM.User("username", g.Username)
-		if i != nil {
-			tracelog.CompletedError(err, "NewUserController", "uc.UM.NewUserModel")
+		if err != nil {
+			tracelog.CompletedError(err, "NewUser", "uc.UM.NewUser")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
 			return
 		}
 	}
-	// Assert as UserModel
-	user := i.(*models.UserModel)
+	// Assert as User
+	user := i.(*models.MockUser)
 
 	// Compare hashes
 	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
 	if hash != user.UserData.Hash {
-		tracelog.CompletedError(err, "NewUserController", "Hashes comparison")
+		tracelog.CompletedError(err, "NewUser", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
 		return
 	}
@@ -73,7 +73,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	uc.UM.UserData = user.UserData
 	err = uc.setSession(c)
 	if err != nil {
-		tracelog.CompletedError(err, "NewUserController", "uc.setSession")
+		tracelog.CompletedError(err, "NewUser", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -82,14 +82,14 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 // Logout logs the user out
-func (uc *UserController) Logout(c *gin.Context) {
+func (uc *MockUser) Logout(c *gin.Context) {
 	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
 }
 
 // Register registers the user
-func (uc *UserController) Register(c *gin.Context) {
+func (uc *MockUser) Register(c *gin.Context) {
 	var r Register
 	// Bind params
 	c.Bind(&r)
@@ -106,7 +106,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	// Create user
 	id, err := uc.UM.Create()
 	if err != nil {
-		tracelog.CompletedError(err, "NewUserController", "uc.UM.Save")
+		tracelog.CompletedError(err, "NewUser", "uc.UM.Save")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -117,7 +117,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	// Set session
 	err = uc.setSession(c)
 	if err != nil {
-		tracelog.CompletedError(err, "NewUserController", "uc.setSession")
+		tracelog.CompletedError(err, "NewUser", "uc.setSession")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -126,7 +126,7 @@ func (uc *UserController) Register(c *gin.Context) {
 }
 
 // Update udpates the user
-func (uc *UserController) Update(c *gin.Context) {
+func (uc *MockUser) Update(c *gin.Context) {
 	var u Update
 	// Bind params
 	c.Bind(&u)
@@ -140,7 +140,7 @@ func (uc *UserController) Update(c *gin.Context) {
 	// Update user
 	err := uc.UM.Update()
 	if err != nil {
-		tracelog.CompletedError(err, "NewUserController", "uc.UM.Update")
+		tracelog.CompletedError(err, "NewUser", "uc.UM.Update")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -149,16 +149,16 @@ func (uc *UserController) Update(c *gin.Context) {
 }
 
 // Delete sends delete confirmation email to the user
-func (uc *UserController) Delete(c *gin.Context) {
+func (uc *MockUser) Delete(c *gin.Context) {
 	// Send email confirmaation here
 }
 
 // ConfirmDelete deletes the user
-func (uc *UserController) ConfirmDelete(c *gin.Context) {
+func (uc *MockUser) ConfirmDelete(c *gin.Context) {
 	// Delete user
 	err := uc.UM.Delete(c.Params.ByName("nonce"))
 	if err != nil {
-		tracelog.CompletedError(err, "NewUserController", "uc.UM.Delete")
+		tracelog.CompletedError(err, "NewUser", "uc.UM.Delete")
 		c.JSON(500, gin.H{"message": "Something went wrong.", "status": 500})
 		return
 	}
@@ -167,7 +167,7 @@ func (uc *UserController) ConfirmDelete(c *gin.Context) {
 }
 
 // setSession sets the session
-func (uc *UserController) setSession(c *gin.Context) error {
+func (uc *MockUser) setSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 
@@ -189,7 +189,7 @@ func (uc *UserController) setSession(c *gin.Context) error {
 }
 
 // clearSession destroys the session
-func (uc *UserController) clearSession(c *gin.Context) error {
+func (uc *MockUser) clearSession(c *gin.Context) error {
 	// Get session
 	session := c.MustGet("session").(*sessions.Session)
 	session.Options.MaxAge = -3600

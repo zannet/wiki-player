@@ -1,8 +1,8 @@
 package interfaces
 
-// UserModelInterface is the Interface for User models
-type UserModelInterface interface {
-	User(field, value string) (UserModelInterface, error)
+// UserModel is the Interface for User models
+type UserModel interface {
+	User(field, value string) (UserModel, error)
 	Update() error
 	Create() (string, error)
 	Delete(nonce string) error

@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserControllerInterface is the Interface for User controllers
-type UserControllerInterface interface {
+// UserController is the Interface for User controllers
+type UserController interface {
 	Login(c *gin.Context)
 	Logout(c *gin.Context)
 	Register(c *gin.Context)

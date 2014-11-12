@@ -30,8 +30,8 @@ func main() {
 	defer dbHandle.Close()
 
 	// Init Models
-	sm := &models.SongModel{DbHandle: dbHandle}
-	nm := &models.NonceModel{DbHandle: dbHandle}
+	sm := &models.Song{DbHandle: dbHandle}
+	nm := &models.Nonce{DbHandle: dbHandle}
 	um, err := factories.NewUserModel(dbHandle, lib.EnvConfigEntry("Mode"))
 	if err != nil {
 		tracelog.CompletedError(err, "main", "Model creation failed")
@@ -39,9 +39,9 @@ func main() {
 	}
 
 	// Init Controllers
-	sc := &controllers.SongController{SM: sm}
-	nc := &controllers.NonceController{NM: nm}
-	vc := &controllers.ViewController{Store: store}
+	sc := &controllers.Song{SM: sm}
+	nc := &controllers.Nonce{NM: nm}
+	vc := &controllers.View{Store: store}
 	uc, err := factories.NewUserController(um, store, lib.EnvConfigEntry("Mode"))
 	if err != nil {
 		tracelog.CompletedError(err, "main", "Controller creation failed")

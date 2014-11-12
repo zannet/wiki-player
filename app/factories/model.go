@@ -8,11 +8,11 @@ import (
 )
 
 // NewUserModel returns instance of User models
-func NewUserModel(dbHandle *sql.DB, mode string) (interfaces.UserModelInterface, error) {
+func NewUserModel(dbHandle *sql.DB, mode string) (interfaces.UserModel, error) {
 	if mode == "mock" {
-		return &models.MockUserModel{DbHandle: dbHandle}, nil
+		return &models.MockUser{DbHandle: dbHandle}, nil
 	} else if mode == "real" {
-		return &models.UserModel{DbHandle: dbHandle}, nil
+		return &models.User{DbHandle: dbHandle}, nil
 	} else {
 		return nil, errInvalidMode
 	}

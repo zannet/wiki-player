@@ -1468,7 +1468,7 @@ define("container/container",
         var container = new Container();
 
         container.register('router:main', Router);
-        container.register('controller:user', UserController);
+        container.register('controller:user', User);
         container.register('controller:post', PostController);
 
         container.typeInjection('controller', 'router', 'router:main');
