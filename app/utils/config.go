@@ -1,4 +1,4 @@
-package lib
+package utils
 
 import (
 	"encoding/json"
@@ -40,7 +40,7 @@ var ci configSingleton
 func MustLoadConfig() {
 	ci.once.Do(func() {
 		// Find the location of the config.json file
-		configFilePath, err := filepath.Abs("config/config.json")
+		configFilePath, err := filepath.Abs("app/config/config.json")
 
 		// Open the config.json file
 		file, err := os.Open(configFilePath)

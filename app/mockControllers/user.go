@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/adred/wiki-player/app/mockModels"
-	"github.com/adred/wiki-player/lib"
+	"github.com/adred/wiki-player/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/goinggo/tracelog"
 	"github.com/gorilla/sessions"
@@ -62,7 +62,7 @@ func (uc *User) Login(c *gin.Context) {
 	user := i.(*mockModels.User)
 
 	// Compare hashes
-	hash := lib.ComputeHmac256(g.Password, lib.ConfigEntry("Salt"))
+	hash := utils.ComputeHmac256(g.Password, utils.ConfigEntry("Salt"))
 	if hash != user.UserData.Hash {
 		tracelog.CompletedError(err, "NewUser", "Hashes comparison")
 		c.JSON(401, gin.H{"message": "Invalid password.", "status": 401})
@@ -99,7 +99,7 @@ func (uc *User) Register(c *gin.Context) {
 	uc.UM.UserData.Username = r.Username
 	uc.UM.UserData.FirstName = r.FirstName
 	uc.UM.UserData.LastName = r.LastName
-	uc.UM.UserData.Hash = lib.ComputeHmac256(r.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData.Hash = utils.ComputeHmac256(r.Password, utils.ConfigEntry("Salt"))
 	uc.UM.UserData.AccessLevel = 10 // Figure out how to set this properly
 	uc.UM.UserData.Joined = time.Now().Local()
 
@@ -135,7 +135,7 @@ func (uc *User) Update(c *gin.Context) {
 	uc.UM.UserData.Email = u.Email
 	uc.UM.UserData.FirstName = u.FirstName
 	uc.UM.UserData.LastName = u.LastName
-	uc.UM.UserData.Hash = lib.ComputeHmac256(u.Password, lib.ConfigEntry("Salt"))
+	uc.UM.UserData.Hash = utils.ComputeHmac256(u.Password, utils.ConfigEntry("Salt"))
 
 	// Update user
 	err := uc.UM.Update()

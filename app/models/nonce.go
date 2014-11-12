@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/adred/wiki-player/lib"
+	"github.com/adred/wiki-player/app/utils"
 )
 
 type (
@@ -21,7 +21,7 @@ func (nm *Nonce) Create(uid string) (string, error) {
 		return "", err
 	}
 
-	nonce := lib.RandomString(16)
+	nonce := utils.RandomString(16)
 	created := time.Now().Local()
 
 	_, err = stmt.Exec(uid, nonce, created)

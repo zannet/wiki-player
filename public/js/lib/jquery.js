@@ -1,5 +1,5 @@
 /*!
- * jQuery JavaScript Library v2.1.1
+ * jQuery JavaScript utilsrary v2.1.1
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -672,7 +672,7 @@ var i,
 			"*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" + whitespace +
 			"*(\\d+)|))" + whitespace + "*\\)|)", "i" ),
 		"bool": new RegExp( "^(?:" + booleans + ")$", "i" ),
-		// For use in libraries implementing .is()
+		// For use in utilsraries implementing .is()
 		// We use this for POS matching in `select`
 		"needsContext": new RegExp( "^" + whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
 			whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
@@ -1175,7 +1175,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 			// Support: IE8, Opera 11-12.16
 			// Nothing should be selected when empty strings follow ^= or $= or *=
 			// The test attribute must be unknown in Opera but "safe" for WinRT
-			// http://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
+			// http://msdn.microsoft.com/en-us/utilsrary/ie/hh465388.aspx#attribute_section
 			if ( div.querySelectorAll("[msallowclip^='']").length ) {
 				rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
 			}
@@ -1471,7 +1471,7 @@ Sizzle.uniqueSort = function( results ) {
 };
 
 /**
- * libity function for retrieving the text value of an array of DOM nodes
+ * utilsity function for retrieving the text value of an array of DOM nodes
  * @param {Array|Element} elem
  */
 getText = Sizzle.getText = function( elem ) {
@@ -2537,7 +2537,7 @@ support.sortDetached = assert(function( div1 ) {
 
 // Support: IE<8
 // Prevent attribute/property "interpolation"
-// http://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
+// http://msdn.microsoft.com/en-us/utilsrary/ms536429%28VS.85%29.aspx
 if ( !assert(function( div ) {
 	div.innerHTML = "<a href='#'></a>";
 	return div.firstChild.getAttribute("href") === "#" ;
@@ -4053,7 +4053,7 @@ function safeActiveElement() {
 
 /*
  * Helper functions for managing events -- not part of the public interface.
- * Props to Dean Edwards' addEvent library for many of the ideas.
+ * Props to Dean Edwards' addEvent utilsrary for many of the ideas.
  */
 jQuery.event = {
 
@@ -9142,10 +9142,10 @@ jQuery.fn.andSelf = jQuery.fn.addBack;
 // file name. Do this after creating the global so that if an AMD module wants
 // to call noConflict to hide this version of jQuery, it will work.
 
-// Note that for maximum portability, libraries that are not jQuery should
+// Note that for maximum portability, utilsraries that are not jQuery should
 // declare themselves as anonymous modules, and avoid setting a global if an
 // AMD loader is present. jQuery is a special case. For more information, see
-// https://github.com/jrburke/requirejs/wiki/Updating-existing-libraries#wiki-anon
+// https://github.com/jrburke/requirejs/wiki/Updating-existing-utilsraries#wiki-anon
 
 if ( typeof define === "function" && define.amd ) {
 	define( "jquery", [], function() {
