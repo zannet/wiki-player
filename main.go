@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/adred/wiki-player/app/controllers"
-	"github.com/adred/wiki-player/app/factories"
 	"github.com/adred/wiki-player/app/middlewares"
 	"github.com/adred/wiki-player/app/models"
 	"github.com/adred/wiki-player/app/utils"
@@ -32,21 +31,13 @@ func main() {
 	// Init Models
 	sm := &models.Song{DbHandle: dbHandle}
 	nm := &models.Nonce{DbHandle: dbHandle}
-	um, err := factories.NewUserModel(dbHandle, utils.EnvConfigEntry("Mode"))
-	if err != nil {
-		tracelog.CompletedError(err, "main", "Model creation failed")
-		panic(err.Error())
-	}
+	um := &models.User{DbHandle: dbHandle}
 
 	// Init Controllers
 	sc := &controllers.Song{SM: sm}
 	nc := &controllers.Nonce{NM: nm}
 	vc := &controllers.View{Store: store}
-	uc, err := factories.NewUserController(um, store, utils.EnvConfigEntry("Mode"))
-	if err != nil {
-		tracelog.CompletedError(err, "main", "Controller creation failed")
-		panic(err.Error())
-	}
+	uc := &controllers.User{UM: um, Store: store}
 
 	// Init Gin
 	mux := gin.Default()

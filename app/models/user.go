@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"strconv"
 	"time"
-
-	"github.com/adred/wiki-player/app/interfaces"
 )
 
 type (
@@ -29,7 +27,7 @@ type (
 )
 
 // User returns UserData instance
-func (um *User) User(field, value string) (interfaces.UserModel, error) {
+func (um *User) User(field, value string) (*User, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
 	query += field
 	query += " = ?"

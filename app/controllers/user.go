@@ -48,18 +48,16 @@ func (uc *User) Login(c *gin.Context) {
 	c.Bind(&g)
 
 	// Check if user exists and get UserData instance if it does
-	i, err := uc.UM.User("email", g.Username)
+	user, err := uc.UM.User("email", g.Username)
 	if err != nil {
 		// Mybe the user provided the username instead of email
-		i, err = uc.UM.User("username", g.Username)
-		if i != nil {
+		user, err = uc.UM.User("username", g.Username)
+		if user != nil {
 			tracelog.CompletedError(err, "NewUser", "uc.UM.NewUser")
 			c.JSON(401, gin.H{"message": "Invalid Username.", "status": 401})
 			return
 		}
 	}
-	// Assert as User
-	user := i.(*models.User)
 
 	// Compare hashes
 	hash := utils.ComputeHmac256(g.Password, utils.ConfigEntry("Salt"))
