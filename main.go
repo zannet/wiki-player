@@ -31,7 +31,7 @@ func main() {
 	// Init Models
 	sm := &models.Song{DbHandle: dbHandle}
 	nm := &models.Nonce{DbHandle: dbHandle}
-	um := &models.User{DbHandle: dbHandle}
+	um := models.NewUser(dbHandle)
 
 	// Init Controllers
 	sc := &controllers.Song{SM: sm}

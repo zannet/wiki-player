@@ -26,6 +26,14 @@ type (
 	}
 )
 
+// NewUser returns a new instance of User model
+func NewUser(dbHandle *sql.DB) *User {
+	return &User{
+		DbHandle: dbHandle,
+		UserData: &userData{},
+	}
+}
+
 // User returns UserData instance
 func (um *User) User(field, value string) (*User, error) {
 	query := "SELECT id, email, username, first_name, last_name, hash, access_level, joined FROM users WHERE "
