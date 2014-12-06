@@ -12,6 +12,7 @@ func TestUserRegister(t *testing.T) {
 
 	rdr := strings.NewReader(jsonStr)
 	req, err := http.NewRequest("POST", url, rdr)
+	req.Header.Add("Content-Type", "application/json")
 	res, err := http.DefaultClient.Do(req)
 
 	if err != nil {
