@@ -22,8 +22,7 @@ func MustLoadDB() {
 	handle.once.Do(func() {
 		// Get database name
 		database := ConfigEntry("Database")
-		conn, err := sql.Open(ConfigEntry("Driver"),
-			ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+database+"?parseTime=true")
+		conn, err := sql.Open(ConfigEntry("Driver"), ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+database+"?parseTime=true")
 		if err != nil {
 			tracelog.CompletedError(err, "MustLoadDB", "sql.Open")
 			panic(err.Error())
