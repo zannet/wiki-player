@@ -4,14 +4,18 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"fmt"
+)
+
+var (
+	registerUrl string = "http://localhost:9000/api/v1/users/register"
+	testUsername string = "x"
+	userData string = `{ "email": "red.adaya@x.com", "username": "`+ testUsername +`", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
 )
 
 func Register() (*http.Response, error) {
-	url := "http://localhost:9000/api/v1/users/register"
-	jsonStr := `{ "email": "red.adaya@x.com", "username": "x", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
-
-	rdr := strings.NewReader(jsonStr)
-	req, err := http.NewRequest("POST", url, rdr)
+	rdr := strings.NewReader(userData)
+	req, err := http.NewRequest("POST", registerUrl, rdr)
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 
@@ -26,7 +30,7 @@ func TestUserRegister(t *testing.T) {
 	}
 
 	if resp.StatusCode != 200 {
-		t.Errorf("Success expected: %d", resp.StatusCode)
+		t.Errorf("Expected status code is 200 but returned: %d", resp.StatusCode)
 	}
 
 	// TODO: Validate the format returned -- it should be in JSON
