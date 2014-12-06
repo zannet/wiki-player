@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"fmt"
 )
 
 var (
 	registerUrl string = "http://localhost:9000/api/v1/users/register"
 	testUsername string = "x"
-	userData string = `{ "email": "red.adaya@x.com", "username": "`+ testUsername +`", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
+	testEmail string = "red.adaya@x.comred.adaya@x.com"
+	userData string = `{ "email": "`+ testEmail +`", "username": "`+ testUsername +`", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
 )
 
 func Register() (*http.Response, error) {

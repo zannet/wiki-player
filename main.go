@@ -63,6 +63,8 @@ func main() {
 	basic.Use(middlewares.Session(store))
 	{
 		basic.GET("/nonce", nc.Create)
+		basic.GET("/users/check-username/:username", uc.CheckUsername)
+		basic.GET("/users/check-email/:email", uc.CheckEmail)
 		basic.POST("/users/login", uc.Login)
 		basic.POST("/users/register", uc.Register)
 	}

@@ -47,7 +47,7 @@ func (uc *User) Login(c *gin.Context) {
 	// Bind params
 	c.Bind(&g)
 
-	// Check if user exists and get UserData instance if it does
+	// Check if user exists and get User instance if it does
 	user, err := uc.UM.User("email", g.Username)
 	if err != nil {
 		// Mybe the user provided the username instead of email
@@ -84,6 +84,43 @@ func (uc *User) Logout(c *gin.Context) {
 	uc.clearSession(c)
 
 	c.JSON(200, gin.H{"message": "Logged out successfully.", "status": 200})
+}
+
+// CheckUsername checks if a given username is already registered
+func (uc *User) CheckUsername(c *gin.Context) {
+	username := c.Params.ByName("username")
+
+	if username == "" {
+		c.JSON(400, gin.H{"message": "No username sent.", "status": 400})
+		return
+	}
+
+	// Check if user exists and get User instance if it does
+	_, err := uc.UM.User("username", username)
+	if err == nil {
+		c.JSON(200, gin.H{"available": "No", "status": 200})
+		return
+	}
+
+	c.JSON(200, gin.H{"available": "Yes", "status": 200})
+}
+
+// CheckEmail checks if a given email address is already registered
+func (uc *User) CheckEmail(c *gin.Context) {
+	email := c.Params.ByName("email")
+	if email == "" {
+		c.JSON(400, gin.H{"message": "No email address sent.", "status": 400})
+		return
+	}
+
+	// Check if user exists and get User instance if it does
+	_, err := uc.UM.User("email", email)
+	if err == nil {
+		c.JSON(200, gin.H{"available": "No", "status": 200})
+		return
+	}
+
+	c.JSON(200, gin.H{"available": "Yes", "status": 200})
 }
 
 // Register registers the user
