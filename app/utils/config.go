@@ -44,7 +44,7 @@ func MustLoadConfig() {
 		mode := EnvConfigEntry("Mode")
 		fmt.Println(mode)
 		// Find the location of the config.json file
-		configFilePath, err := filepath.Abs("app/config/" + mode + ".json")
+		configFilePath, err := filepath.Abs("app/configs/" + mode + ".json")
 
 		// Open the config.json file
 		file, err := os.Open(configFilePath)
