@@ -20,13 +20,8 @@ var handle dbSingleton
 // MustLoadDB loads the database
 func MustLoadDB() {
 	handle.once.Do(func() {
-		var database string
-		if EnvConfigEntry("Mode") == "mock" {
-			database = ConfigEntry("MockDatabase")
-		} else {
-			database = ConfigEntry("Database")
-		}
-
+		// Get database name
+		database := ConfigEntry("Database")
 		conn, err := sql.Open(ConfigEntry("Driver"),
 			ConfigEntry("Username")+":"+ConfigEntry("Password")+"@/"+database+"?parseTime=true")
 		if err != nil {

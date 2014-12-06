@@ -1,0 +1,12 @@
+{
+    "Host": "",
+    "Database": "",
+    "Driver": "",
+    "Username": "",
+    "Password": "",
+    "LogDir": "",
+    "Salt": "",
+    "SecretKey": "",
+    "SessionName": "",
+    "StaticDir": ""
+}

@@ -1,0 +1,12 @@
+{
+    "Host": "localhost",
+    "Database": "wikiplayer_test",
+    "Driver": "mysql",
+    "Username": "root",
+    "Password": "redeye",
+    "LogDir": "/home/adred/Golang/src/github.com/adred/wiki-player/test/log",
+    "Salt": "Narred",
+    "SecretKey": "NarredIsAwesome",
+    "SessionName": "narred_test",
+    "StaticDir": "/home/adred/Golang/src/github.com/adred/wiki-player/public"
+}

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -39,8 +40,11 @@ var ci configSingleton
 // MustLoadConfig loads the configs and assign it to configMap
 func MustLoadConfig() {
 	ci.once.Do(func() {
+		// Get app mode -- test/development/production
+		mode := EnvConfigEntry("Mode")
+		fmt.Println(mode)
 		// Find the location of the config.json file
-		configFilePath, err := filepath.Abs("app/config/config.json")
+		configFilePath, err := filepath.Abs("app/config/" + mode + ".json")
 
 		// Open the config.json file
 		file, err := os.Open(configFilePath)

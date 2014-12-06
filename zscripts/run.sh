@@ -1,5 +1,4 @@
-export APP_MODE="real"
-export APP_BRANCH="dev"
+export APP_MODE="development"
 
 cd $GOPATH/src/github.com/adred/wiki-player
 go clean -i

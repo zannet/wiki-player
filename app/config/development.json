@@ -1,13 +1,12 @@
 {
 	"Host": "localhost",
-	"Database": "wikiplayer",
-	"MockDatabase": "wikiplayermock",
+	"Database": "wikiplayer_dev",
 	"Driver": "mysql",
 	"Username": "root",
 	"Password": "redeye",
-	"LogDir": "/home/adred/Golang/src/github.com/adred/wiki-player/log",
+	"LogDir": "/home/adred/Golang/src/github.com/adred/wiki-player/development/log",
 	"Salt": "Narred",
 	"SecretKey": "NarredIsAwesome",
-	"SessionName": "narred",
+	"SessionName": "narred_dev",
 	"StaticDir": "/home/adred/Golang/src/github.com/adred/wiki-player/public"
 }
