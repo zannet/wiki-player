@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	testUsername string = "x"
-	testEmail string = "red.adaya@x.com"
+	testUsername = "x"
+	testEmail    = "red.adaya@x.com"
 )
 
 func CheckUsername() (*http.Response, error) {
@@ -27,10 +27,9 @@ func CheckEmail() (*http.Response, error) {
 	return resp, err
 }
 
-
 func Register() (*http.Response, error) {
 	url := "http://localhost:9000/api/v1/users/register"
-	userData := `{ "email": "`+ testEmail +`", "username": "`+ testUsername +`", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
+	userData := `{ "email": "` + testEmail + `", "username": "` + testUsername + `", "first_name": "Red", "last_name": "Adaya", "password": "shadowfiend" }`
 
 	rdr := strings.NewReader(userData)
 	req, err := http.NewRequest("POST", url, rdr)
@@ -39,7 +38,6 @@ func Register() (*http.Response, error) {
 
 	return resp, err
 }
-
 
 // Test functions
 
@@ -50,11 +48,15 @@ func TestCheckUsername(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Validate returned status code
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status code is 200 but returned %d", resp.StatusCode)
 	}
 
-	// TODO: Validate the format returned -- it should be in JSON
+	// Validate response format
+	if resp.Header["Content-Type"][0] != "application/json" {
+		t.Errorf("Expected content type is application/json but returned %s", resp.Header["Content-Type"][0])
+	}
 }
 
 func TestCheckEmail(t *testing.T) {
@@ -64,11 +66,15 @@ func TestCheckEmail(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Validate returned status code
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status code is 200 but returned %d", resp.StatusCode)
 	}
 
-	// TODO: Validate the format returned -- it should be in JSON
+	// Validate response format
+	if resp.Header["Content-Type"][0] != "application/json" {
+		t.Errorf("Expected content type is application/json but returned %s", resp.Header["Content-Type"][0])
+	}
 }
 
 func TestUserRegister(t *testing.T) {
@@ -78,9 +84,13 @@ func TestUserRegister(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Validate returned status code
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status code is 200 but returned %d", resp.StatusCode)
 	}
 
-	// TODO: Validate the format returned -- it should be in JSON
+	// Validate response format
+	if resp.Header["Content-Type"][0] != "application/json" {
+		t.Errorf("Expected content type is application/json but returned %s", resp.Header["Content-Type"][0])
+	}
 }
