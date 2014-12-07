@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"strconv"
 	"time"
 )
 
@@ -89,24 +88,24 @@ func (um *User) Update() error {
 }
 
 // Create creates a user
-func (um *User) Create() (string, error) {
-	stmt, err := um.DbHandle.Prepare("INSERT INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
+func (um *User) Create() (int64, error) {
+	stmt, err := um.DbHandle.Prepare("INSERT IGNORE INTO users VALUES ('', ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	res, err := stmt.Exec(um.UserData.Email, um.UserData.Username, um.UserData.FirstName, um.UserData.LastName,
 		um.UserData.Hash, um.UserData.AccessLevel, um.UserData.Joined)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	lId, err := res.LastInsertId()
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
-	return strconv.FormatInt(lId, 10), nil
+	return lId, nil
 }
 
 // Delete deletes a user

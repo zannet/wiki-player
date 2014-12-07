@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/adred/wiki-player/app/models"
@@ -146,8 +147,13 @@ func (uc *User) Register(c *gin.Context) {
 		return
 	}
 
+	if id == 0 {
+		c.JSON(409, gin.H{"message": "Duplicate entry.", "status": 409})
+		return
+	}
+
 	// Set user ID to last inserted ID
-	uc.UM.UserData.Id = id
+	uc.UM.UserData.Id = strconv.FormatInt(id, 10)
 
 	// Set session
 	err = uc.setSession(c)
